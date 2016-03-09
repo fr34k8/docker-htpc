@@ -1,8 +1,5 @@
 # TODO:
-# x deluge container
-# - figure out how the fuck to build workflows for sonarr and sab
 # - plex-pass container
-# x make containers run as non-root users
 # - test a reboot restarts all containers
 
 
@@ -11,81 +8,56 @@ SABNZBD_IMAGE = joemiller/sabnzbd
 SONARR_IMAGE  = joemiller/sonarr
 DELUGE_IMAGE  = joemiller/deluge
 
-# macros
-EXISTS = @docker inspect --format='{{ .State.Running }}'
+CONTAINERS = sabnzbd sonarr deluge
 
 # aggregate tasks
-start_all: start_sabnzbd start_sonarr start_deluge ## start all containers
-
 build_all: build_sabnzbd build_sonarr build_deluge ## build all containers
 
+create_all: create_sabnzbd create_sonarr create_deluge ## create and start all containers
+
+stop_all:  ## stop all containers
+	docker stop $(CONTAINERS)
+
+restart_all:  ## restart all containers
+	docker restart $(CONTAINERS)
+
+remove_all:  ## remove all containers
+	docker rm $(CONTAINERS)
+
 # sabnzbd
-build_sabnzbd:
-	docker build -t $(SABNZBD_IMAGE) sabnzbd
+build_sabnzbd:  ## build the sabnzbd container
+	docker build -t $(SABNZBD_IMAGE) --pull=true --no-cache=true sabnzbd
 
-_rm_sabnzbd:
-	$(EXISTS) sabnzbd && docker rm sabnzbd || true
-
-_create_sabnzbd: build_sabnzbd
-	$(EXISTS) sabnzbd || docker create --name sabnzbd --restart=always \
+create_sabnzbd:  ## create and start the sabnzbd container
+	docker run -d --name sabnzbd --restart=always \
 		-p 8085:8085 \
 		-v /files:/files \
 		-v /etc/sabnzbd:/config \
 		$(SABNZBD_IMAGE)
 
-start_sabnzbd: ## start the sabnzbd container
-	docker start sabnzbd
-
-stop_sabnzbd: ## stop the sabnzbd container
-	$(EXISTS) sabnzbd && docker stop sabnzbd || true
-
-restart_sabnzbd: ## restart the sabnzbd container
-
 # sonarr
-build_sonarr:
-	docker build -t $(SONARR_IMAGE) sonarr
+build_sonarr:  ## build the sonarr container
+	docker build -t $(SONARR_IMAGE) --pull=true --no-cache=true sonarr
 
-_rm_sonarr:
-	$(EXISTS) sonarr && docker rm sonarr || true
-
-_create_sonarr: build_sonarr
-	$(EXISTS) sonarr || docker create --name sonarr --restart=always \
+create_sonarr:  ## create and start the sonarr container
+	docker run -d --name sonarr --restart=always \
 		-p 8989:8989 \
 		-v /files:/files \
 		-v /etc/sonarr:/config \
 		$(SONARR_IMAGE)
 
-start_sonarr: ## start the sonarr container
-	docker start sonarr
-
-stop_sonarr: ## stop the sonarr container
-	$(EXISTS) sonarr && docker stop sonarr || true
-
-restart_sonarr: ## restart the sonarr container
-
 # deluge
-build_deluge:
-	docker build -t $(DELUGE_IMAGE) deluge
+build_deluge:  ## build the deluge container
+	docker build -t $(DELUGE_IMAGE) --pull=true --no-cache=true deluge
 
-_rm_deluge:
-	$(EXISTS) deluge && docker rm deluge || true
-
-_create_deluge: build_deluge
-	$(EXISTS) deluge || docker create --name deluge --restart=always \
+create_deluge:  ## create and start the deluge container
+	docker run -d --name deluge --restart=always \
 		-p 8083:8083 \
 		-p 53160:53160 \
 		--net=host \
 		-v /files:/files \
 		-v /etc/deluge:/config \
 		$(DELUGE_IMAGE)
-
-start_deluge: ## start the deluge container
-	docker start deluge
-
-stop_deluge: ## stop the deluge container
-	$(EXISTS) deluge && docker stop deluge || true
-
-restart_deluge: ## restart the deluge container
 
 # helpers
 help: ## print list of tasks and descriptions
