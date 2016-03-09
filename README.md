@@ -16,7 +16,8 @@ init
 ----
 
 All containers use [s6-overlay](https://github.com/just-containers/s6-overlay)
-for process supervision and some minimal startup scripts.
+for process supervision and pre-startup scripts to fix permissions on the
+/config volumes.
 
 user
 ----
@@ -60,6 +61,19 @@ Usage
 ### List tasks and descriptions
 
     $ make help
+
+    build_all                      build all containers
+    build_deluge                   build the deluge container
+    build_sabnzbd                  build the sabnzbd container
+    build_sonarr                   build the sonarr container
+    create_all                     create and start all containers
+    create_deluge                  create and start the deluge container
+    create_sabnzbd                 create and start the sabnzbd container
+    create_sonarr                  create and start the sonarr container
+    help                           print list of tasks and descriptions
+    remove_all                     remove all containers
+    restart_all                    restart all containers
+    stop_all                       stop all containers
 
 ### Build containers
 
