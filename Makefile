@@ -7,6 +7,7 @@
 SABNZBD_IMAGE = joemiller/sabnzbd
 SONARR_IMAGE  = joemiller/sonarr
 DELUGE_IMAGE  = joemiller/deluge
+PLEX_IMAGE    = joemiller/plex
 
 CONTAINERS = sabnzbd sonarr deluge
 
@@ -58,6 +59,20 @@ create_deluge:  ## create and start the deluge container
 		-v /files:/files \
 		-v /etc/deluge:/config \
 		$(DELUGE_IMAGE)
+
+# plex
+build_plex:  ## build the plex container
+	./plex/plexupdate.sh -r | tee | tail -1 >./plex/download_url
+	docker build -t $(PLEX_IMAGE) --pull=true --no-cache=true plex
+
+create_plex:  ## create the plex container
+	@echo "NOTE: make sure you have run 'chown -R nobody:nobody /etc/plex' before creating the plex container."
+	docker run -d --name plex --restart=always \
+		-p 32400:32400 \
+		--net=host \
+		-v /files:/files \
+		-v /etc/plex:/config \
+		$(PLEX_IMAGE)
 
 # helpers
 help: ## print list of tasks and descriptions

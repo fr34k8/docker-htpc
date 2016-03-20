@@ -1,0 +1,7 @@
+# this is an s6 /etc/fix/attrs.d/ config file. see: https://github.com/just-containers/s6-overlay#fixing-ownership--permissions
+
+# Skip this. The plex directory can get very large (over 200,000 files) and chown'ing recursively
+# over this directory can add several minutes to startup. Instead, we need to instruct the user
+# to handle this once before starting plex for the first time.
+
+#/config true nobody 0644 0755
