@@ -122,3 +122,13 @@ Use `docker logs` command:
 
     $ docker logs sonarr
     $ docker logs -f sonarr
+
+Notes
+-----
+
+### deluge autoconnect
+
+Sonarr will not be able to connect to deluge unless you login to the deluge-web
+client and select the server. This needs to be done once per startup of the
+deluge container, unless auto-connect is enabled. Follow these directions
+to setup deluge-web auto-connect: http://dev.deluge-torrent.org/wiki/Faq#HowdoIauto-connecttoaspecificdaemon

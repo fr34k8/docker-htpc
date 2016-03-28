@@ -2,19 +2,25 @@
 # - plex-pass container
 # - test a reboot restarts all containers
 
+# adding a new container:
+#  1. add CONTAINER_NAME var
+#  2. add container to CONTAINERS list
+#  3. add to build_all and create_all tasks
+#  4. implement build_CONTAINER and create_CONTAINER tasks
 
 # config
-SABNZBD_IMAGE = joemiller/sabnzbd
-SONARR_IMAGE  = joemiller/sonarr
-DELUGE_IMAGE  = joemiller/deluge
-PLEX_IMAGE    = joemiller/plex
+SABNZBD_IMAGE  = joemiller/sabnzbd
+SONARR_IMAGE   = joemiller/sonarr
+DELUGE_IMAGE   = joemiller/deluge
+PLEX_IMAGE     = joemiller/plex
+PLEXPY_IMAGE   = linuxserver/plexpy
 
-CONTAINERS = sabnzbd sonarr deluge
+CONTAINERS = sabnzbd sonarr deluge plex plexpy
 
 # aggregate tasks
-build_all: build_sabnzbd build_sonarr build_deluge ## build all containers
+build_all: build_sabnzbd build_sonarr build_deluge build_plex ## build all containers
 
-create_all: create_sabnzbd create_sonarr create_deluge ## create and start all containers
+create_all: create_sabnzbd create_sonarr create_deluge create_plex create_plexpy ## create and start all containers
 
 stop_all:  ## stop all containers
 	docker stop $(CONTAINERS)
@@ -73,6 +79,18 @@ create_plex:  ## create the plex container
 		-v /files:/files \
 		-v /etc/plex:/config \
 		$(PLEX_IMAGE)
+
+# plexpy
+build_plexpy: ## build the plexpy container
+	@echo "not necessary"
+
+create_plexpy:  ## create the plexpy container
+	docker run -d --name plexpy --restart=always \
+		-e PUID=65534 -e PGID=65534 \
+		-p 8181:8181 \
+		-v /etc/plexpy:/config \
+		-v /etc/localtime:/etc/localtime:ro \
+		$(PLEXPY_IMAGE)
 
 # helpers
 help: ## print list of tasks and descriptions
