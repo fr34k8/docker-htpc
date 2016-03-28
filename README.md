@@ -51,6 +51,8 @@ Ports
             in order to allow deluge to punch holes with NAT-PMP. It will work
             fine without `--net=host` however, perhaps with limited
             connectivity to some torrent peers.
+- `plex`: 32400. Note this container is run with `--net=host`.
+- `plexpy`: http web ui on 8181
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
