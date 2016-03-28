@@ -48,6 +48,7 @@ build_sonarr:  ## build the sonarr container
 
 create_sonarr:  ## create and start the sonarr container
 	docker run -d --name sonarr --restart=always \
+		-e XDG_CONFIG_HOME=/config \
 		-p 8989:8989 \
 		-v /files:/files \
 		-v /etc/sonarr:/config \
