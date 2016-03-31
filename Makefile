@@ -9,18 +9,19 @@
 #  4. implement build_CONTAINER and create_CONTAINER tasks
 
 # config
-SABNZBD_IMAGE  = joemiller/sabnzbd
-SONARR_IMAGE   = joemiller/sonarr
-DELUGE_IMAGE   = joemiller/deluge
-PLEX_IMAGE     = joemiller/plex
-PLEXPY_IMAGE   = linuxserver/plexpy
+SABNZBD_IMAGE     = joemiller/sabnzbd
+SONARR_IMAGE      = joemiller/sonarr
+DELUGE_IMAGE      = joemiller/deluge
+PLEX_IMAGE        = joemiller/plex
+PLEXPY_IMAGE      = linuxserver/plexpy
+COUCHPOTATO_IMAGE = linuxserver/couchpotato
 
-CONTAINERS = sabnzbd sonarr deluge plex plexpy
+CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato
 
 # aggregate tasks
-build_all: build_sabnzbd build_sonarr build_deluge build_plex ## build all containers
+build_all: build_sabnzbd build_sonarr build_deluge build_plex build_plexpy build_couchpotato ## build all containers
 
-create_all: create_sabnzbd create_sonarr create_deluge create_plex create_plexpy ## create and start all containers
+create_all: create_sabnzbd create_sonarr create_deluge create_plex create_plexpy create_couchpotato ## create and start all containers
 
 stop_all:  ## stop all containers
 	docker stop $(CONTAINERS)
@@ -83,7 +84,7 @@ create_plex:  ## create the plex container
 
 # plexpy
 build_plexpy: ## build the plexpy container
-	@echo "not necessary"
+	docker pull $(PLEXPY_IMAGE)
 
 create_plexpy:  ## create the plexpy container
 	docker run -d --name plexpy --restart=always \
@@ -92,6 +93,20 @@ create_plexpy:  ## create the plexpy container
 		-v /etc/plexpy:/config \
 		-v /etc/localtime:/etc/localtime:ro \
 		$(PLEXPY_IMAGE)
+
+# couchpotato
+build_couchpotato: ## build the couchpotato container
+	docker pull $(COUCHPOTATO_IMAGE)
+
+create_couchpotato:  ## create the couchpotato container
+	docker run -d --name couchpotato --restart=always \
+		-e PUID=65534 -e PGID=65534 \
+		-p 5050:5050 \
+		-v /etc/localtime:/etc/localtime:ro \
+		-v /etc/couchpotato:/config \
+		-v /files/usenet/downloads:/downloads \
+		-v /files/movies:/movies \
+		$(COUCHPOTATO_IMAGE)
 
 # helpers
 help: ## print list of tasks and descriptions

@@ -53,6 +53,7 @@ Ports
             connectivity to some torrent peers.
 - `plex`: 32400. Note this container is run with `--net=host`.
 - `plexpy`: http web ui on 8181
+- `couchpotato`: http web ui on 5050
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
