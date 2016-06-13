@@ -3,14 +3,12 @@ FROM ubuntu:trusty
 # enable multiverse, needed for unrar
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 
-RUN apt-get install -qy software-properties-common \
+RUN apt-get -q update \
+    && apt-get install -qy software-properties-common \
     && add-apt-repository -y  ppa:jcfp/ppa \
     && apt-get -q update \
     && apt-get install -qy \
       sabnzbdplus \
-      sabnzbdplus-theme-classic \
-      sabnzbdplus-theme-mobile \
-      sabnzbdplus-theme-plush \
       par2 \
       python-yenc \
       unzip \
