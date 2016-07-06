@@ -70,7 +70,7 @@ create_deluge:  ## create and start the deluge container
 
 # plex
 build_plex:  ## build the plex container
-	./plex/plexupdate.sh -r | tee | tail -1 >./plex/download_url
+	./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
 	docker build -t $(PLEX_IMAGE) --pull=true --no-cache=true plex
 
 create_plex:  ## create the plex container
