@@ -1,6 +1,7 @@
-FROM ubuntu:trusty
+FROM ubuntu:16.04
 
-RUN apt-get install -qy software-properties-common \
+RUN apt-get -q update \
+    && apt-get install -qy software-properties-common \
     && add-apt-repository ppa:deluge-team/ppa \
     && apt-get update -q \
     && apt-get install -qy \

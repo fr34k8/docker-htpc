@@ -1,8 +1,5 @@
 FROM ubuntu:16.04
 
-# enable multiverse, needed for unrar
-RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
-
 RUN apt-get -q update \
     && apt-get install -qy software-properties-common \
     && add-apt-repository -y  multiverse \

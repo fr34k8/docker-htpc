@@ -1,8 +1,6 @@
-FROM ubuntu:trusty
-MAINTAINER TODO
+FROM ubuntu:16.04
 
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
-  && apt-get update -q \
+RUN apt-get update -q \
   && apt-get install -qy \
     wget \
   && apt-get -y autoremove \
