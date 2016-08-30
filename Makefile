@@ -71,6 +71,7 @@ create_deluge:  ## create and start the deluge container
 # plex
 build_plex:  ## build the plex container
 	./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
+	# echo 'https://downloads.plex.tv/plex-media-server/1.0.3.2461-35f0caa/plexmediaserver_1.0.3.2461-35f0caa_amd64.deb' | tee ./plex/download_url
 	docker build -t $(PLEX_IMAGE) --pull=true --no-cache=true plex
 
 create_plex:  ## create the plex container
