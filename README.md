@@ -135,3 +135,20 @@ Sonarr will not be able to connect to deluge unless you login to the deluge-web
 client and select the server. This needs to be done once per startup of the
 deluge container, unless auto-connect is enabled. Follow these directions
 to setup deluge-web auto-connect: http://dev.deluge-torrent.org/wiki/Faq#HowdoIauto-connecttoaspecificdaemon
+
+### timecapsule (Samba)
+
+This container expects to connect to a docker network named `localnet`. This
+network should be created with the macvlan or ipvlan drivers available in
+docker 1.12+. This allows the container to be started and acquire its own
+IP on your local network in order to run Bonjour (avahi) services to announce
+itself on the network.
+
+If your local network is 192.168.0.0/24 you can create a `localnet` network
+with the following docker command:
+
+    $ docker network create -d macvlan \
+        --subnet 192.168.0.0/24 \
+        --gateway 192.168.0.1
+        -o parent=eth0 \
+        localnet

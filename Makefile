@@ -1,11 +1,6 @@
-# TODO:
-# - plex-pass container
-# - test a reboot restarts all containers
-
 # adding a new container:
-#  1. add CONTAINER_NAME var
-#  2. add container to CONTAINERS list
-#  3. add to build_all and create_all tasks
+#  1. add <CONTAINER>_IMAGE var
+#  2. add container name to CONTAINERS list
 #  4. implement build_CONTAINER and create_CONTAINER tasks
 
 # config
@@ -15,22 +10,36 @@ DELUGE_IMAGE      = joemiller/deluge
 PLEX_IMAGE        = joemiller/plex
 PLEXPY_IMAGE      = linuxserver/plexpy
 COUCHPOTATO_IMAGE = linuxserver/couchpotato
+TIMECAPSULE_IMAGE = joemiller/timecapsule
 
-CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato
+CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato timecapsule
+
+# A docker network will be created for containers (such as 'timecapsule') that require
+# their own IP address on the local network (similar to a VM in bridge networking mode).
+NETWORK_NAME=localnet-v6only
+NETWORK_IFACE=br0
+NETWORK_CREATE_CMD=docker network create -d macvlan --ipv6 -o parent=$(NETWORK_IFACE) $(NETWORK_NAME)
+
+# helper tasks
+_configure_network:
+	@docker network inspect $(NETWORK_NAME) >/dev/null 2>&1 || $(NETWORK_CREATE_CMD)
+
+_remove_network:
+	docker network rm $(NETWORK_NAME)
 
 # aggregate tasks
-build_all: build_sabnzbd build_sonarr build_deluge build_plex build_plexpy build_couchpotato ## build all containers
+# build_all: build_sabnzbd build_sonarr build_deluge build_plex build_plexpy build_couchpotato ## build all containers
 
-create_all: create_sabnzbd create_sonarr create_deluge create_plex create_plexpy create_couchpotato ## create and start all containers
+# create_all: _configure_network create_sabnzbd create_sonarr create_deluge create_plex create_plexpy create_couchpotato ## create and start all containers
 
-stop_all:  ## stop all containers
-	docker stop $(CONTAINERS)
+# stop_all:  ## stop all containers
+# 	docker stop $(CONTAINERS)
 
-restart_all:  ## restart all containers
-	docker restart $(CONTAINERS)
+# restart_all:  ## restart all containers
+# 	docker restart $(CONTAINERS)
 
-remove_all:  ## remove all containers
-	docker rm $(CONTAINERS)
+# remove_all:  ## remove all containers
+# 	docker rm $(CONTAINERS)
 
 # sabnzbd
 build_sabnzbd:  ## build the sabnzbd container
@@ -108,6 +117,20 @@ create_couchpotato:  ## create the couchpotato container
 		-v /files/usenet/downloads:/downloads \
 		-v /files/movies:/movies \
 		$(COUCHPOTATO_IMAGE)
+
+# timecapsule (samba)
+build_timecapsule:  ## build the timecapsule (samba) container
+	docker build -t $(TIMECAPSULE_IMAGE) --pull=true timecapsule
+
+create_timecapsule: _configure_network ## create and start the timecapsule (samba) container
+	docker run -d --name timecapsule --restart=always \
+		--hostname=timecapsule \
+		--net=$(NETWORK_NAME) \
+		-v /files/timemachine:/timemachine \
+		$(TIMECAPSULE_IMAGE)
+
+run_smbstatus: ## run 'smbstatus' inside the running timecapsule container
+	@docker exec timecapsule /usr/local/samba/bin/smbstatus
 
 # helpers
 help: ## print list of tasks and descriptions

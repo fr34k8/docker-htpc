@@ -1,0 +1,3 @@
+# this is an s6 /etc/fix/attrs.d/ config file. see: https://github.com/just-containers/s6-overlay#fixing-ownership--permissions
+
+/timemachine true backup:backup 0644 0755
