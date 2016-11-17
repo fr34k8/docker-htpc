@@ -55,7 +55,7 @@ Ports
 - `plexpy`: http web ui on 8181
 - `couchpotato`: http web ui on 5050
 - `timecapsule`: Uses docker network driver such as MacVLAN so that the container.
-                 See [timecapsule (Samba)](#timecapsule (Samba)).
+                 See [timecapsule (Samba)](#timecapsule-samba).
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
