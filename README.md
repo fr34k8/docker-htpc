@@ -54,6 +54,8 @@ Ports
 - `plex`: 32400. Note this container is run with `--net=host`.
 - `plexpy`: http web ui on 8181
 - `couchpotato`: http web ui on 5050
+- `timecapsule`: Uses docker network driver such as MacVLAN so that the container.
+                 See [timecapsule (Samba)](#timecapsule (Samba)).
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
@@ -143,6 +145,17 @@ network should be created with the macvlan or ipvlan drivers available in
 docker 1.12+. This allows the container to be started and acquire its own
 IP on your local network in order to run Bonjour (avahi) services to announce
 itself on the network.
+
+This is particular to my setup because I have an existing
+samba instance running on the host providing general file sharing services. This
+container acts as a separate device that looks roughly like a timecapsule on
+the network exporting only a single `timemachine` mount.
+
+It is probably possible to use standard Docker port mapping instead. See the
+udp and tcp ports exposed in `timecapsule/Dockerfile`. However, getting the
+avahi announcement to work could be challenging. A workaround would be to
+publish the timecapsule services from the host's avahi using the
+`.timecapsule/smb.service` file.
 
 If your local network is 192.168.0.0/24 you can create a `localnet` network
 with the following docker command:
