@@ -165,3 +165,9 @@ with the following docker command:
         --gateway 192.168.0.1
         -o parent=eth0 \
         localnet
+
+TimeMachine will attempt to use the entire disk by default. We constrain it
+by lying about the max available space on the samba share. This is done using
+a `dfree` script. By default, the max space presented to TimeMachine is 750GB.
+This can be changed by updating the `TIMEMACHINE_MAX_VOL_SIZE_GB` environment
+variable in the Dockerfile.
