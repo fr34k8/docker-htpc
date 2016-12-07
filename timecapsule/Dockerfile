@@ -33,6 +33,10 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
 # install samba config
 ADD ./smb.conf /usr/local/samba/etc/smb.conf
 
+# set an upper limit on the reported vol size so that timemachine doesn't eat the entire disk
+ENV TIMEMACHINE_MAX_VOL_SIZE_GB  750
+ADD ./samba-dfree.sh /bin/samba-dfree.sh
+
 # create a 'backup' user with password 'backup'
 RUN (echo backup; echo backup) | /usr/local/samba/bin/smbpasswd -s -a backup
 
