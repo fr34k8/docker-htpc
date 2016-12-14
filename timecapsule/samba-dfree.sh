@@ -7,7 +7,7 @@ TIMEMACHINE_MAX_VOL_SIZE_GB="${TIMEMACHINE_MAX_VOL_SIZE_GB:-750}"
 
 blocksize=1  # use 1 byte blocks instead of 1024 (default) so we don't have to convert values
 max=$((TIMEMACHINE_MAX_VOL_SIZE_GB * 1024*1024*1024))
-used=$(du -s -B1 "/timemachine" | awk '{print $1}')
+used=$(du -s -B${blocksize} "/timemachine" | awk '{print $1}')
 available=$((max - used))
 
 echo "${max} ${available} ${blocksize}"
