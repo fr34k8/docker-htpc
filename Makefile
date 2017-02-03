@@ -64,6 +64,11 @@ create_sonarr:  ## create and start the sonarr container
 		-v /etc/sonarr:/config \
 		$(SONARR_IMAGE)
 
+upgrade_sonarr: ## upgrade and launch a new sonarr container
+	$(MAKE) build_sonarr && \
+	   	(docker inspect sonarr >/dev/null && { docker stop sonarr && docker rm sonarr; } || true) \
+		&& $(MAKE) create_sonarr
+
 # deluge
 build_deluge:  ## build the deluge container
 	docker build -t $(DELUGE_IMAGE) --pull=true --no-cache=true deluge
@@ -91,6 +96,11 @@ create_plex:  ## create the plex container
 		-v /files:/files \
 		-v /etc/plex:/config \
 		$(PLEX_IMAGE)
+
+upgrade_plex: ## upgrade and launch a new plex container
+	$(MAKE) build_plex && \
+	   	(docker inspect plex >/dev/null && { docker stop plex && docker rm plex; } || true) \
+		&& $(MAKE) create_plex
 
 # plexpy
 build_plexpy: ## build the plexpy container
@@ -128,6 +138,11 @@ create_timecapsule: _configure_network ## create and start the timecapsule (samb
 		--net=$(NETWORK_NAME) \
 		-v /files/timemachine:/timemachine \
 		$(TIMECAPSULE_IMAGE)
+
+upgrade_timecapsule: ## upgrade and launch a new timecapsule container
+	$(MAKE) build_timecapsule && \
+	   	(docker inspect timecapsule >/dev/null && { docker stop timecapsule && docker rm timecapsule; } || true) \
+		&& $(MAKE) create_timecapsule
 
 run_smbstatus: ## run 'smbstatus' inside the running timecapsule container
 	@docker exec timecapsule /usr/local/samba/bin/smbstatus
