@@ -18,7 +18,10 @@ CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato timecapsule
 # their own IP address on the local network (similar to a VM in bridge networking mode).
 NETWORK_NAME=localnet-v6only
 NETWORK_IFACE=br0
-NETWORK_CREATE_CMD=docker network create -d macvlan --ipv6 -o parent=$(NETWORK_IFACE) $(NETWORK_NAME)
+# NOTE: --subnet=2001::0/64 is a "dummy" network. This is required for docker 1.12.4+ which requires a
+#       --subnet if --ipv6 is specified. Your network should use IPv6 SLAAC so that the container will
+#       automatically acquire an ipv6 address from the real local subnet.
+NETWORK_CREATE_CMD=docker network create -d macvlan --ipv6 --subnet=2001::0/64 -o parent=$(NETWORK_IFACE) $(NETWORK_NAME)
 
 # helper tasks
 _configure_network:
