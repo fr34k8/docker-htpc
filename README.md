@@ -32,15 +32,12 @@ Volumes
 
 Each container follows a similar pattern for config and data volumes:
 
-- `/files` -> `/files`:
+- `/files` -> `/files`: Large data volume. In my case, there are folders such
+  as: `/files/tv_shows`, `/files/movies`, `/files/downloads`, etc.
 
-Large data volume. In my case, there are folders such
-as: `/files/tv_shows`, `/files/movies`, `/files/downloads`, etc.
-
-- `/etc/<container_name>` -> `/config`:
-
-eg: `/etc/sabnzbd/` on the host is mapped to `/config` inside the sabnzbd
-container for persistent config storage.
+- `/etc/<container_name>` -> `/config`: eg: `/etc/sabnzbd/` on the host is
+   mapped to `/config` inside the sabnzbd
+   container for persistent config storage.
 
 Ports
 -----
@@ -54,8 +51,9 @@ Ports
 - `plex`: 32400. Note this container is run with `--net=host`.
 - `plexpy`: http web ui on 8181
 - `couchpotato`: http web ui on 5050
-- `timecapsule`: Uses docker network driver such as MacVLAN so that the container.
-                 See [timecapsule (Samba)](#timecapsule-samba).
+- `timecapsule`: Uses docker network driver such as MacVLAN so that the container
+-                is able to obtain its own IP address on the LAN.
+                 See [timecapsule (Samba)](#timecapsule-samba) for more details.
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
@@ -155,7 +153,7 @@ It is probably possible to use standard Docker port mapping instead. See the
 udp and tcp ports exposed in `timecapsule/Dockerfile`. However, getting the
 avahi announcement to work could be challenging. A workaround would be to
 publish the timecapsule services from the host's avahi using the
-`.timecapsule/smb.service` file.
+`timecapsule/smb.service` file.
 
 If your local network is 192.168.0.0/24 you can create a `localnet` network
 with the following docker command:
