@@ -11,8 +11,9 @@ PLEX_IMAGE        = joemiller/plex
 PLEXPY_IMAGE      = linuxserver/plexpy
 COUCHPOTATO_IMAGE = linuxserver/couchpotato
 TIMECAPSULE_IMAGE = joemiller/timecapsule
+MUXIMUX_IMAGE     = linuxserver/muximux
 
-CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato timecapsule
+CONTAINERS = sabnzbd sonarr deluge plex plexpy couchpotato timecapsule muximux
 
 # A docker network will be created for containers (such as 'timecapsule') that require
 # their own IP address on the local network (similar to a VM in bridge networking mode).
@@ -117,6 +118,10 @@ create_plexpy:  ## create the plexpy container
 		-v /etc/localtime:/etc/localtime:ro \
 		$(PLEXPY_IMAGE)
 
+upgrade_plexpy: ## upgrade and restart the plexpy container
+	# we use the linuxserver/plexpy image which auto-upgrades on restart
+	docker restart plexpy
+
 # couchpotato
 build_couchpotato: ## build the couchpotato container
 	docker pull $(COUCHPOTATO_IMAGE)
@@ -149,6 +154,22 @@ upgrade_timecapsule: ## upgrade and launch a new timecapsule container
 
 run_smbstatus: ## run 'smbstatus' inside the running timecapsule container
 	@docker exec timecapsule /usr/local/samba/bin/smbstatus
+
+# muximux
+build_muximux: ## build the muximux container
+	docker pull $(MUXIMUX_IMAGE)
+
+create_muximux:  ## create the muximux container
+	docker run -d --name muximux --restart=always \
+		-e PUID=65534 -e PGID=65534 \
+		-p 8000:80 \
+		-v /etc/muximux:/config \
+		-v /etc/localtime:/etc/localtime:ro \
+		$(MUXIMUX_IMAGE)
+
+upgrade_muximux: ## upgrade and restart the muximux container
+	# we use the linuxserver/muximux image which auto-upgrades on restart
+	docker restart muximux
 
 # helpers
 help: ## print list of tasks and descriptions

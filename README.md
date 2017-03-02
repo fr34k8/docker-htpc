@@ -54,6 +54,7 @@ Ports
 - `timecapsule`: Uses docker network driver such as MacVLAN so that the container
 -                is able to obtain its own IP address on the LAN.
                  See [timecapsule (Samba)](#timecapsule-samba) for more details.
+- `muximux`: http web ui on port 8000
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
