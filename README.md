@@ -30,7 +30,7 @@ perms in the /config volumes.
 Volumes
 -------
 
-Each container follows a similar pattern for config and data volumes:
+Each container generally follows a similar pattern for config and data volumes:
 
 - `/files` -> `/files`: Large data volume. In my case, there are folders such
   as: `/files/tv_shows`, `/files/movies`, `/files/downloads`, etc.
@@ -38,6 +38,11 @@ Each container follows a similar pattern for config and data volumes:
 - `/etc/<container_name>` -> `/config`: eg: `/etc/sabnzbd/` on the host is
    mapped to `/config` inside the sabnzbd
    container for persistent config storage.
+
+This is not the case for all containers. Check the Makefile for details on
+each container.
+
+TODO: enumerate each container's host volume mounts here.
 
 Ports
 -----
@@ -55,6 +60,10 @@ Ports
 -                is able to obtain its own IP address on the LAN.
                  See [timecapsule (Samba)](#timecapsule-samba) for more details.
 - `muximux`: http web ui on port 8000
+- `grafana`: http web ui on port 3000
+- `graphite-api`: No forwarded ports. Accessed only by attaching to the `metrics`
+                  network.
+- `go-carbon`: graphite line protocol on port 2003.
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
@@ -161,7 +170,7 @@ with the following docker command:
 
     $ docker network create -d macvlan \
         --subnet 192.168.0.0/24 \
-        --gateway 192.168.0.1
+        --gateway 192.168.0.1 \
         -o parent=eth0 \
         localnet
 
@@ -170,3 +179,19 @@ by lying about the max available space on the samba share. This is done using
 a `dfree` script. By default, the max space presented to TimeMachine is 750GB.
 This can be changed by updating the `TIMEMACHINE_MAX_VOL_SIZE_GB` environment
 variable in the Dockerfile.
+
+### metrics (grafana, graphite-api, go-carbon)
+
+All three metrics containers are attached to a user-defined bridge network
+named `metrics`. The only forwarded port is port 3000 (http) to the `grafana`
+host.
+
+Metrics are stored in `/etc/go-carbon/data` which is mounted into both the
+`go-carbon` and `graphite-api` containers.
+
+`grafana` fetches metrics from the `graphite-api` container over port 8000.
+
+Metrics are sent to port 2003 which is forwarded into the `go-carbon` container,
+example from host:
+
+        echo "testdata.foo.bar $RANDOM $(date +%s)" | tee >&2 | nc localhost 2003
