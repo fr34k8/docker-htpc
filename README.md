@@ -75,19 +75,6 @@ Usage
 
     $ make help
 
-    build_all                      build all containers
-    build_deluge                   build the deluge container
-    build_sabnzbd                  build the sabnzbd container
-    build_sonarr                   build the sonarr container
-    create_all                     create and start all containers
-    create_deluge                  create and start the deluge container
-    create_sabnzbd                 create and start the sabnzbd container
-    create_sonarr                  create and start the sonarr container
-    help                           print list of tasks and descriptions
-    remove_all                     remove all containers
-    restart_all                    restart all containers
-    stop_all                       stop all containers
-
 ### Build containers
 
     $ make build_all
@@ -111,14 +98,10 @@ releasing a new .deb for the latest version.
 
 ### Update individual container
 
-Stop the existing container, delete it, build a new one, create it:
+Use the `upgrade_<container>` task which automates the process of stopping the
+existing container, deleting it, building a new one, and re-creating it:
 
-    $ docker stop sabnzbd
-    $ docker rm   sabnzbd
-    $ make build_sabnzbd
-    $ make create_sabnzbd
-
-@TODO: make a single task for updating/re-creating an individual container..
+    $ make upgrade_plex
 
 ### Start/Stop/Restart individual containers
 

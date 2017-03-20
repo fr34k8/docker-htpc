@@ -40,16 +40,14 @@ METRICS_NETWORK_CREATE_CMD=docker network create --driver=bridge \
 						   --subnet=192.168.1.0/24 --gateway=192.168.1.1 \
 						   $(METRICS_NETWORK_NAME)
 
-#TODO: setup go-carbon image, setup graphite-api image, setup grafana image
-#TODO: move metrics to /virt or leave in /etc/go-carbon/data?
-
 # helper tasks
 _configure_networks:
 	@docker network inspect $(NETWORK_NAME) >/dev/null 2>&1 || $(NETWORK_CREATE_CMD)
 	@docker network inspect $(METRICS_NETWORK_NAME) >/dev/null 2>&1 || $(METRICS_NETWORK_CREATE_CMD)
 
 _remove_networks:
-	docker network rm $(NETWORK_NAME)
+	@docker network rm $(NETWORK_NAME)
+	@docker network rm $(METRICS_NETWORK_NAME)
 
 # aggregate tasks
 # build_all: build_sabnzbd build_sonarr build_deluge build_plex build_plexpy build_couchpotato ## build all containers
