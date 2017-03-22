@@ -1,14 +1,21 @@
 FROM ubuntu:16.04
 
+# Set the locale so that SABnzbd can properly handle unicoded files
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
 RUN apt-get -q update \
     && apt-get install -qy software-properties-common \
     && add-apt-repository -y  multiverse \
     && add-apt-repository -y  ppa:jcfp/ppa \
+    && add-apt-repository -y  ppa:jcfp/sab-addons \
     && apt-get -q update \
     && apt-get install -qy \
       sabnzbdplus \
-      par2 \
-      python-yenc \
+      par2-tbb \
+      python-sabyenc \
       unzip \
       unrar \
     && apt-get -y autoremove \
