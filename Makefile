@@ -74,9 +74,13 @@ create_sabnzbd:  ## create and start the sabnzbd container
 		-p 8085:8085 \
 		-v /files:/files \
 		-v /etc/sabnzbd:/config \
+		-v /etc/localtime:/etc/localtime:ro \
 		$(SABNZBD_IMAGE)
 
-# TODO: implement upgrade_sabnzbd
+upgrade_sabnzbd: ## upgrade and launch a new sabnzbd container
+	$(MAKE) build_sabnzbd && \
+	   	(docker inspect sabnzbd >/dev/null && { docker stop sabnzbd && docker rm sabnzbd; } || true) \
+		&& $(MAKE) create_sabnzbd
 
 # sonarr
 build_sonarr:  ## build the sonarr container
@@ -90,6 +94,7 @@ create_sonarr:  ## create and start the sonarr container
 		-p 8989:8989 \
 		-v /files:/files \
 		-v /etc/sonarr:/config \
+		-v /etc/localtime:/etc/localtime:ro \
 		$(SONARR_IMAGE)
 
 upgrade_sonarr: ## upgrade and launch a new sonarr container
