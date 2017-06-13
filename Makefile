@@ -8,6 +8,7 @@ SABNZBD_IMAGE          = joemiller/sabnzbd
 SONARR_IMAGE           = joemiller/sonarr
 DELUGE_IMAGE           = joemiller/deluge
 PLEX_IMAGE             = joemiller/plex
+#PLEX_IMAGE             = plexinc/pms-docker
 PLEXPY_IMAGE           = linuxserver/plexpy
 TIMECAPSULE_IMAGE      = joemiller/timecapsule
 MUXIMUX_IMAGE          = linuxserver/muximux
@@ -124,8 +125,8 @@ upgrade_deluge: ## upgrade and launch a new deluge container
 
 # plex
 build_plex:  ## build the plex container
+	#docker pull $(PLEX_IMAGE)
 	./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
-	# echo 'https://downloads.plex.tv/plex-media-server/1.0.3.2461-35f0caa/plexmediaserver_1.0.3.2461-35f0caa_amd64.deb' | tee ./plex/download_url
 	docker build -t $(PLEX_IMAGE) --pull=true --no-cache=true plex
 
 create_plex:  ## create the plex container
@@ -137,8 +138,12 @@ create_plex:  ## create the plex container
 		--net=host \
 		-v /files:/files \
 		-v /etc/plex:/config \
-		-v /dev/dri:/dev/dri \
+		--device /dev/dri:/dev/dri \
 		$(PLEX_IMAGE)
+
+	# for the official image:
+		# -v /etc/plex:/config \
+		# -v /files:/data \
 
 upgrade_plex: ## upgrade and launch a new plex container
 	$(MAKE) build_plex && \
