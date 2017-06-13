@@ -1,7 +1,5 @@
 FROM ubuntu:16.04
 
-# Set the locale so that SABnzbd can properly handle unicoded files
-RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
@@ -18,11 +16,14 @@ RUN apt-get -q update \
       python-sabyenc \
       unzip \
       unrar \
+      locales \
     && apt-get -y autoremove \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
+# Set the locale so that SABnzbd can properly handle unicoded files
+RUN locale-gen en_US.UTF-8
 # install s6-overlay init manager (https://github.com/just-containers/s6-overlay)
 ADD https://github.com/just-containers/s6-overlay/releases/download/v1.17.2.0/s6-overlay-amd64.tar.gz /tmp/
 RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
