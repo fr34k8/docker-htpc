@@ -18,13 +18,45 @@ RUN apt-get -q update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-# clone and build samba. Based on this patch: https://github.com/samba-team/samba/pull/64
+# - original build method. clone and build samba. Based on this patch: https://github.com/samba-team/samba/pull/64
+# RUN cd /tmp \
+#     && git clone -b bz12380-full_fsync https://github.com/kevinanderson1/samba.git \
+#     && cd samba \
+#      && ./configure --without-ldap --without-ads --without-regedit \
+#      && make -j$(nproc) \
+#      && make -j$(nproc) install \
+#     && cd /tmp \
+#     && rm -rf -- ./samba
+
+# - build method: following instructions from the thread, approxy aug-sept 2017
+# RUN cd /tmp \
+#   && curl -L -O https://download.samba.org/pub/samba/stable/samba-4.6.6.tar.gz \
+#     && tar zxf samba-4.6.6.tar.gz \
+#     && cd samba-4.6.6 \
+#   && curl -L -O https://patch-diff.githubusercontent.com/raw/samba-team/samba/pull/64.patch \
+#     && patch -p1 < 64.patch \
+#     && ./configure --without-ldap --without-ads --without-regedit \
+#     && make -j$(nproc) \
+#     && make -j$(nproc) install \
+#   && cd /tmp \
+#   && rm -rf -- ./samba-4.6.6
+
+# - build from samba master branch
 RUN cd /tmp \
-    && git clone -b bz12380-full_fsync https://github.com/kevinanderson1/samba.git \
+    && git clone https://github.com/samba-team/samba.git \
     && cd samba \
-    && ./configure && make -j$(nproc) && make -j$(nproc) install \
+     && ./configure --without-ldap --without-ads --without-regedit \
+     && make -j$(nproc) \
+     && make -j$(nproc) install \
     && cd /tmp \
     && rm -rf -- ./samba
+
+# - build from local checkout
+# ADD ./samba /src
+# RUN cd /src \
+#     && ./configure --without-ldap --without-ads --without-regedit \
+#     && make -j$(nproc) \
+#     && make -j$(nproc) install
 
 # install s6-overlay init manager (https://github.com/just-containers/s6-overlay)
 ADD https://github.com/just-containers/s6-overlay/releases/download/v1.17.2.0/s6-overlay-amd64.tar.gz /tmp/
@@ -34,7 +66,7 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
 ADD ./smb.conf /usr/local/samba/etc/smb.conf
 
 # set an upper limit on the reported vol size so that timemachine doesn't eat the entire disk
-ENV TIMEMACHINE_MAX_VOL_SIZE_GB  750
+ENV TIMEMACHINE_MAX_VOL_SIZE_GB  1024
 ADD ./samba-dfree.sh /bin/samba-dfree.sh
 
 # create a 'backup' user with password 'backup'
@@ -50,7 +82,7 @@ ADD smbd-run.sh         /etc/services.d/smbd/run
 ADD avahi-daemon-run.sh /etc/services.d/avahi-daemon/run
 
 # s6 fix-attrs script
-ADD 01-timemachine-data-dir /etc/fix-attrs.d/01-timemachine-data-dir
+#ADD 01-timemachine-data-dir /etc/fix-attrs.d/01-timemachine-data-dir
 
 EXPOSE 137/udp 138/udp 139 445
 
