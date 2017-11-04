@@ -1,0 +1,129 @@
+# TODO:
+# [x] plexpy
+# [ ] plex
+#   [ ] challenge: execute command on host before build
+# [ ] sonarr
+# [ ] sabnzbd
+# [ ] deluge
+# [ ] timecapsule
+#   [ ] challenge: create custom network, with all supported settings
+# [x] grafana
+# [x] go-carbon
+# [x] collectd-docker
+#   [ ] broken! might be an issue with newer version of docker. look at the logs for the conntainer
+# [x] graphite-api
+# [x] muximux
+---
+# XXX: some network features don't work in 3.0-3.3, but work in 2.1, go figure :(
+version: '2.1'
+services:
+  plexpy:
+    container_name: plexpy
+    image: linuxserver/plexpy
+    restart: always
+    labels:
+      collectd_docker_app: plexpy
+      collectd_docker_task: plexpy
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/plexpy:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8181:8181"
+
+  muximux:
+    container_name: muximux
+    image: linuxserver/muximux
+    restart: always
+    labels:
+      collectd_docker_app: muximux
+      collectd_docker_task: muximux
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/muximux:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8000:80"
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    restart: always
+    labels:
+      collectd_docker_app: grafana
+      collectd_docker_task: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - /etc/grafana:/var/lib/grafana
+    networks:
+      - metrics
+    ports:
+      - "3000:3000"
+
+  graphite-api:
+    container_name: graphite-api
+    image: brutasse/graphite-api
+    restart: always
+    labels:
+      collectd_docker_app: graphite-api
+      collectd_docker_task: graphite-api
+    volumes:
+      - /etc/graphite-api/graphite-api.yaml:/etc/graphite-api.yaml
+      - /etc/go-carbon/data:/data
+    networks:
+      - metrics
+
+  go-carbon:
+    container_name: go-carbon
+    image: joemiller/go-carbon
+    restart: always
+    build: ./go-carbon
+    labels:
+      collectd_docker_app: graphite-api
+      collectd_docker_task: graphite-api
+    volumes:
+      - /etc/go-carbon/data:/data
+      - /etc/go-carbon/config:/config
+    networks:
+      - metrics
+    ports:
+      - "2003:2003"
+      - "2003:2003/udp"
+      - "2004:2004"
+      - "7002:7002"
+      - "8080:8080"
+
+  collectd-docker:
+    container_name: collectd-docker
+    image: bobrik/collectd-docker
+    restart: always
+    labels:
+      collectd_docker_app: collectd-docker
+      collectd_docker_task: collectd-docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - metrics
+
+networks:
+  localnet-v6only-new:
+    driver: macvlan
+    enable_ipv6: true
+    driver_opts:
+      parent: br0
+    ipam:
+      config:
+        - subnet: 2001::0/64
+
+  metrics:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
