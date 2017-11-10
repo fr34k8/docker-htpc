@@ -1,21 +1,41 @@
 # TODO:
 # [x] plexpy
-# [ ] plex
-#   [ ] challenge: execute command on host before build
-# [ ] sonarr
-# [ ] sabnzbd
-# [ ] deluge
-# [ ] timecapsule
-#   [ ] challenge: create custom network, with all supported settings
+# [x] plex
+#   [x] challenge: execute command on host before build
+# [x] sonarr
+# [x] sabnzbd
+# [x] deluge
+# [x] timecapsule
+#   [x] challenge: create custom network, with all supported settings
 # [x] grafana
 # [x] go-carbon
 # [x] collectd-docker
 #   [ ] broken! might be an issue with newer version of docker. look at the logs for the conntainer
 # [x] graphite-api
 # [x] muximux
+
 ---
 # XXX: some network features don't work in 3.0-3.3, but work in 2.1, go figure :(
 version: '2.1'
+
+networks:
+  localnet-v6only:
+    driver: macvlan
+    enable_ipv6: true
+    driver_opts:
+      parent: br0
+    ipam:
+      config:
+        - subnet: 2001::0/64
+
+  metrics:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+
 services:
   plexpy:
     container_name: plexpy
@@ -48,6 +68,87 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8000:80"
+
+  sabnzbd:
+    container_name: sabnzbd
+    image: joemiller/sabnzbd
+    build: ./sabnzbd
+    restart: always
+    labels:
+      collectd_docker_app: sabnzbd
+      collectd_docker_task: sabnzbd
+    volumes:
+      - /files:/files
+      - /etc/sabnzbd:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8085:8085"
+
+  sonarr:
+    container_name: sonarr
+    image: joemiller/sonarr
+    build: ./sonarr
+    restart: always
+    labels:
+      collectd_docker_app: sonarr
+      collectd_docker_task: sonarr
+    environment:
+      - XDG_CONFIG_HOME=/config
+    volumes:
+      - /files:/files
+      - /etc/sonarr:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8989:8989"
+
+  deluge:
+    container_name: deluge
+    image: joemiller/deluge
+    build: ./deluge
+    restart: always
+    labels:
+      collectd_docker_app: deluge
+      collectd_docker_task: deluge
+    volumes:
+      - /files:/files
+      - /etc/deluge:/config
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    # ports:
+    #   - "8083:8083"
+    #   - "53160:53160"
+
+  plex:
+    container_name: plex
+    image: joemiller/plex
+    build: ./plex
+    restart: always
+    labels:
+      collectd_docker_app: plex
+      collectd_docker_task: plex
+    volumes:
+      - /files:/files
+      - /etc/plex:/config
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
+    # ports:
+    #   - "32400:32400"
+
+  timecapsule:
+    container_name: timecapsule
+    image: joemiller/timecapsule
+    build: ./timecapsule
+    restart: always
+    hostname: timecapsule
+    labels:
+      collectd_docker_app: timecapsule
+      collectd_docker_task: timecapsule
+    volumes:
+      - /files/timemachine:/timemachine
+    networks:
+      - localnet-v6only
 
   grafana:
     container_name: grafana
@@ -98,32 +199,16 @@ services:
       - "7002:7002"
       - "8080:8080"
 
-  collectd-docker:
-    container_name: collectd-docker
-    image: bobrik/collectd-docker
-    restart: always
-    labels:
-      collectd_docker_app: collectd-docker
-      collectd_docker_task: collectd-docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - metrics
+  # TODO: broken as of Nov-2017. probably not compatible with newest docker
+  # collectd-docker:
+  #   container_name: collectd-docker
+  #   image: bobrik/collectd-docker
+  #   restart: always
+  #   labels:
+  #     collectd_docker_app: collectd-docker
+  #     collectd_docker_task: collectd-docker
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - metrics
 
-networks:
-  localnet-v6only-new:
-    driver: macvlan
-    enable_ipv6: true
-    driver_opts:
-      parent: br0
-    ipam:
-      config:
-        - subnet: 2001::0/64
-
-  metrics:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.1

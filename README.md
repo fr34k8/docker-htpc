@@ -3,8 +3,8 @@ docker-htpc
 
 Containers for HTPC apps.
 
-All containers are built from the `ubuntu:trusty` base image because they all
-have official .deb distributions for ubuntu.
+All containers are built from the `ubuntu:trusty` base image because most of the
+apps publish official .deb distributions for Ubuntu.
 
 ```
 WARNING: This is a work in progress and suits my own specific needs. Feel free
@@ -75,33 +75,19 @@ Usage
 
     $ make help
 
-### Build containers
-
-    $ make build_all
-
 ### Create and start containers
 
-    $ make create_all
+    $ make start
 
 Containers will be created, started, and set with `--restart=always` flag.
 
-### Update all containers
+### Update (rebuild + recreate) all containers
 
-    $ make stop_all
-    $ make remove_all
-    $ make build_all
-    $ make create_all
+    $ make rebuild-all
 
-This will rebuild each container, pulling down latest code for reach. Most
-containers are built from .deb pkgs so this will depend on the upstream project
-releasing a new .deb for the latest version.
+### Update (rebuild + recreate) specific containers
 
-### Update individual container
-
-Use the `upgrade_<container>` task which automates the process of stopping the
-existing container, deleting it, building a new one, and re-creating it:
-
-    $ make upgrade_plex
+    $ make rebuild CONTAINER=<name>
 
 ### Start/Stop/Restart individual containers
 
