@@ -26,6 +26,7 @@ networks:
       parent: br0
     ipam:
       config:
+        # bogus subnet here. the container should use SLAAC to acquire a real ipv6 addr from your router
         - subnet: 2001::0/64
 
   metrics:
