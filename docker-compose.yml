@@ -19,6 +19,7 @@
 version: '2.1'
 
 networks:
+  # a local ipv6 bridge network for timemachine.
   localnet-v6only:
     driver: macvlan
     enable_ipv6: true
@@ -29,6 +30,7 @@ networks:
         # bogus subnet here. the container should use SLAAC to acquire a real ipv6 addr from your router
         - subnet: 2001::0/64
 
+  # private network for graphite/grafana related services to communicate
   metrics:
     driver: bridge
     ipam:
@@ -153,7 +155,7 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana/grafana
+    image: grafana/grafana:4.6.3
     restart: always
     labels:
       collectd_docker_app: grafana
