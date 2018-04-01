@@ -6,7 +6,7 @@ rebuild: ## rebuild and recreate container specified in CONTAINER= arg
 		echo "ERROR: Must specify CONTAINER="; \
 		exit 1; \
 	fi
-	@docker-compose pull --parallel $(CONTAINER)
+	#@docker-compose pull --parallel $(CONTAINER)
 	@docker-compose build --pull --no-cache $(CONTAINER)
 	@docker-compose up -d --force-recreate $(CONTAINER)
 

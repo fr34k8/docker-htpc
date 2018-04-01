@@ -42,7 +42,8 @@ networks:
 services:
   plexpy:
     container_name: plexpy
-    image: linuxserver/plexpy
+    image: joemiller/plexpy
+    build: ./plexpy
     restart: always
     labels:
       collectd_docker_app: plexpy
@@ -58,7 +59,8 @@ services:
 
   muximux:
     container_name: muximux
-    image: linuxserver/muximux
+    image: joemiller/muximux
+    build: ./muximux
     restart: always
     labels:
       collectd_docker_app: muximux
@@ -138,6 +140,25 @@ services:
       - /dev/dri:/dev/dri
     # ports:
     #   - "32400:32400"
+
+  emby:
+    container_name: emby
+    image: emby/embyserver
+    restart: always
+    labels:
+      collectd_docker_app: emby
+      collectd_docker_task: emby
+    volumes:
+      - /files:/files
+      - /etc/emby:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - APP_USER=nobody
+      - APP_UID=65534
+      - APP_GID=65534
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
 
   timecapsule:
     container_name: timecapsule
