@@ -54,7 +54,7 @@ Ports
             fine without `--net=host` however, perhaps with limited
             connectivity to some torrent peers.
 - `plex`: 32400. Note this container is run with `--net=host`.
-- `plexpy`: http web ui on 8181
+- `tautulli`: http web ui on 8181
 - `couchpotato`: http web ui on 5050
 - `timecapsule`: Uses docker network driver such as MacVLAN so that the container
 -                is able to obtain its own IP address on the LAN.

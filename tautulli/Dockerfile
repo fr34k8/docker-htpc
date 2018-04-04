@@ -1,0 +1,1 @@
+FROM tautulli/tautulli:latest

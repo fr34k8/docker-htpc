@@ -40,19 +40,19 @@ networks:
           gateway: 192.168.1.1
 
 services:
-  plexpy:
-    container_name: plexpy
-    image: joemiller/plexpy
-    build: ./plexpy
+  tautulli:
+    container_name: tautulli
+    image: joemiller/tautulli
+    build: ./tautulli
     restart: always
     labels:
-      collectd_docker_app: plexpy
-      collectd_docker_task: plexpy
+      collectd_docker_app: tautulli
+      collectd_docker_task: tautulli
     environment:
       - PUID=65534
       - PGID=65534
     volumes:
-      - /etc/plexpy:/config
+      - /etc/tautulli:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8181:8181"
