@@ -177,7 +177,8 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana/grafana:4.6.3
+    image: joemiller/grafana
+    build: ./grafana
     restart: always
     labels:
       collectd_docker_app: grafana
@@ -193,7 +194,8 @@ services:
 
   graphite-api:
     container_name: graphite-api
-    image: brutasse/graphite-api
+    image: joemiller/graphite-api
+    build: ./graphite-api
     restart: always
     labels:
       collectd_docker_app: graphite-api
