@@ -51,6 +51,7 @@ services:
     environment:
       - PUID=65534
       - PGID=65534
+      - ADVANCED_GIT_BRANCH=master
     volumes:
       - /etc/tautulli:/config
       - /etc/localtime:/etc/localtime:ro
