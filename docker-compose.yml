@@ -19,18 +19,25 @@
 version: '2.1'
 
 networks:
-  # a local ipv6 bridge network for timemachine.
-  localnet-v6only:
+  # 'localnet': this network allows containers to obtain their own IP's on the localnetwork, similar to a VM in bridge mode
+  # - For ipv4, an address between 172.25.0.64-95 will be assigned by Docker. For static assignments, see the 'unifi' container config.
+  # - For ipv6, docker will not assign an address and the container must acquire an address using SLAAC, which assumes
+  #   a router on the localnet providing SLAAC services is available.
+  localnet:
     driver: macvlan
     enable_ipv6: true
     driver_opts:
       parent: br0
     ipam:
       config:
-        # bogus subnet here. the container should use SLAAC to acquire a real ipv6 addr from your router
+        # bogus ipv6 subnet here. The container should use SLAAC to acquire a real ipv6 addr from your router
         - subnet: 2001::0/64
+        # 172.25.0.64/27 = 64-95. Don't let your DHCP server assign IP's from this range.
+        - subnet: 172.25.0.0/24
+          gateway: 172.25.0.1
+          ip_range: 172.25.0.64/27
 
-  # private network for graphite/grafana related services to communicate
+  # 'metrics': a private network for graphite/grafana related services to communicate with each other.
   metrics:
     driver: bridge
     ipam:
@@ -174,7 +181,25 @@ services:
     volumes:
       - /files/timemachine:/timemachine
     networks:
-      - localnet-v6only
+      - localnet
+
+  unifi:
+    container_name: unifi
+    image: joemiller/unifi
+    build: ./unifi
+    restart: always
+    labels:
+      collectd_docker_app: unifi
+      collectd_docker_task: unifi
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/unifi:/config
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+        localnet:
+          ipv4_address: 172.25.0.65
 
   grafana:
     container_name: grafana
