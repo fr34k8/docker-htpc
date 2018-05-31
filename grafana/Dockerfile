@@ -1,1 +1,3 @@
-FROM grafana/grafana:4.6.3
+FROM grafana/grafana:5.1.3
+
+USER nobody
