@@ -82,6 +82,23 @@ services:
     ports:
       - "8000:80"
 
+  organizr:
+    container_name: organizr
+    image: joemiller/organizr
+    build: ./organizr
+    restart: always
+    labels:
+      collectd_docker_app: organizr
+      collectd_docker_task: organizr
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/organizr:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8282:80"
+
   sabnzbd:
     container_name: sabnzbd
     image: joemiller/sabnzbd

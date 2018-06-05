@@ -47,6 +47,8 @@ TODO: enumerate each container's host volume mounts here.
 Ports
 -----
 
+- `muximux`: http web ui on port 8000
+- `organizr`: http web ui on port 8282
 - `sabzbd`: http web ui on 8085
 - `sonarr`: http web ui on 8989
 - `deluge`: web UI on 8083. Note: the deluge container is run with `--net=host`
@@ -59,7 +61,6 @@ Ports
 - `timecapsule`: Uses docker network driver such as MacVLAN so that the container
 -                is able to obtain its own IP address on the LAN.
                  See [timecapsule (Samba)](#timecapsule-samba) for more details.
-- `muximux`: http web ui on port 8000
 - `grafana`: http web ui on port 3000
 - `graphite-api`: No forwarded ports. Accessed only by attaching to the `metrics`
                   network.
