@@ -47,24 +47,45 @@ TODO: enumerate each container's host volume mounts here.
 Ports
 -----
 
-- `muximux`: http web ui on port 8000
-- `organizr`: http web ui on port 8282
-- `sabzbd`: http web ui on 8085
-- `sonarr`: http web ui on 8989
-- `deluge`: web UI on 8083. Note: the deluge container is run with `--net=host`
-            in order to allow deluge to punch holes with NAT-PMP. It will work
-            fine without `--net=host` however, perhaps with limited
-            connectivity to some torrent peers.
-- `plex`: 32400. Note this container is run with `--net=host`.
-- `tautulli`: http web ui on 8181
-- `couchpotato`: http web ui on 5050
-- `timecapsule`: Uses docker network driver such as MacVLAN so that the container
--                is able to obtain its own IP address on the LAN.
-                 See [timecapsule (Samba)](#timecapsule-samba) for more details.
-- `grafana`: http web ui on port 3000
-- `graphite-api`: No forwarded ports. Accessed only by attaching to the `metrics`
-                  network.
-- `go-carbon`: graphite line protocol on port 2003.
+- `organizr`:
+  -  8282: http web ui
+- `muximux`:
+  - 8080: http web ui
+- `tautulli`:
+  - 8181: http web ui
+- `sabzbd`:
+  - 8085: http web ui
+- `sonarr`:
+  - 8989: http web ui
+- `deluge`:
+  - 8083: http web ui
+  - *Note*: the deluge container is run with `--net=host` in order to allow deluge to punch holes with NAT-PMP. It will work
+            fine without `--net=host` however, perhaps with limited connectivity to some torrent peers but more secure.
+- `plex`:
+  - 32400: plex
+  - *Note*: this container is run with `--net=host`.
+- `timecapsule`:
+  - network: macvlan.
+    - This container will be allocated its own IP on your local network based on the macvlan config.
+    - Use `docker inspect` to view the allocated IP
+    - See [timecapsule (Samba)](#timecapsule-samba) for more details.
+- `unifi`:
+  - network: macvlan.
+    - This container will be allocated its own IP on your local network based on the macvlan config.
+    - Use `docker inspect` to view the allocated IP
+- `grafana`:
+  - 3000: http web ui
+- `graphite-api`:
+  - network: `metrics`
+  - No forwarded ports
+- `go-carbon`:
+  - 2003: graphite line protocol
+- `influxdb`:
+  - network: `metrics`
+  - No forwarded ports
+- `telegraf-snmp-unifi`:
+  - network: `metrics`
+  - No forwarded ports
 
 Note: most of these apps can also expose TLS https ports but the current config
       does not expose these.
