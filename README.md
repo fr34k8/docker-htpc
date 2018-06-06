@@ -62,8 +62,9 @@ Ports
   - *Note*: the deluge container is run with `--net=host` in order to allow deluge to punch holes with NAT-PMP. It will work
             fine without `--net=host` however, perhaps with limited connectivity to some torrent peers but more secure.
 - `plex`:
-  - 32400: plex
-  - *Note*: this container is run with `--net=host`.
+  - network: `host`
+- `embyserver`:
+  - network: `host`
 - `timecapsule`:
   - network: macvlan.
     - This container will be allocated its own IP on your local network based on the macvlan config.
