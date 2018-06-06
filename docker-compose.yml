@@ -269,6 +269,32 @@ services:
       - "7002:7002"
       - "8080:8080"
 
+  influxdb:
+    container_name: influxdb
+    image: joemiller/influxdb
+    build: ./influxdb
+    restart: always
+    labels:
+      collectd_docker_app: influxdb
+      collectd_docker_task: influxdb
+    volumes:
+      - /etc/influxdb:/var/lib/influxdb
+    networks:
+      - metrics
+
+  telegraf-snmp-unifi:
+    container_name: telegraf-snmp-unifi
+    image: joemiller/telegraf-snmp-unifi
+    build: ./telegraf-snmp-unifi
+    restart: always
+    labels:
+      collectd_docker_app: telegraf-snmp-unifi
+      collectd_docker_task: telegraf-snmp-unifi
+    volumes:
+      - /etc/telegraf-snmp-unifi:/etc/telegraf
+    networks:
+      - metrics
+
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
   #   container_name: collectd-docker
