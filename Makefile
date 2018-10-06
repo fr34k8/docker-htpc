@@ -6,6 +6,9 @@ rebuild: ## rebuild and recreate container specified in CONTAINER= arg
 		echo "ERROR: Must specify CONTAINER="; \
 		exit 1; \
 	fi
+	@if [ "$(CONTAINER)" = "plex" ]; then \
+		make _update-plex-version-file; \
+	fi
 	@docker-compose build --pull --no-cache $(CONTAINER)
 	@docker-compose up -d --force-recreate $(CONTAINER)
 
@@ -15,9 +18,9 @@ rebuild-all:: _update-plex-version-file ## rebuild and recreate all containers
 _update-plex-version-file:
 	@./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
 
-rebuild-plex: CONTAINER=plex ## special task for rebuild and recreate of the Plex container
-rebuild-plex: _update-plex-version-file
-rebuild-plex: rebuild
+# rebuild-plex: CONTAINER=plex ## special task for rebuild and recreate of the Plex container
+# rebuild-plex: _update-plex-version-file
+# rebuild-plex: rebuild
 
 # helpers
 help: ## print list of tasks and descriptions
