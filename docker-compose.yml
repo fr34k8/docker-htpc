@@ -143,9 +143,9 @@ services:
       - /files:/files
       - /virt/persistent/deluge:/config
       - /etc/localtime:/etc/localtime:ro
-    network_mode: host
-    # ports:
-    #   - "8083:8083"
+    #network_mode: host
+    ports:
+      - "8083:8083"
     #   - "53160:53160"
 
   plex:
