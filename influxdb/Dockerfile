@@ -1,1 +1,1 @@
-FROM influxdb:1.5
+FROM influxdb:1.7
