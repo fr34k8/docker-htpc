@@ -1,0 +1,279 @@
+#!/bin/bash
+######## INDEX ########
+# GPT -> getPlexToken
+# GPS -> getPlexServerToken
+# GPW -> getPlexWebToken
+# HELPERS -> keypair, rawurlencode, trimQuotes
+# RNNG -> running
+# SHARED -> warn, info, warn
+
+######## CONSTANTS ########
+# Current pages we need - Do not change unless Plex.tv changes again
+URL_LOGIN='https://plex.tv/users/sign_in.json'
+URL_DOWNLOAD='https://plex.tv/api/downloads/5.json?channel=plexpass'
+URL_DOWNLOAD_PUBLIC='https://plex.tv/api/downloads/1.json'
+
+# Default options for package managers, override if needed
+REDHAT_INSTALL="dnf -y install"
+DEBIAN_INSTALL="dpkg -i"
+DISTRO_INSTALL=""
+
+#URL for new version check
+UPSTREAM_GIT_URL="https://raw.githubusercontent.com/${GIT_OWNER:-mrworf}/plexupdate/${BRANCHNAME:-master}"
+
+#Files "owned" by plexupdate, for autoupdate
+PLEXUPDATE_FILES="plexupdate.sh plexupdate-core extras/installer.sh extras/cronwrapper"
+
+
+######## FUNCTIONS ########
+#### Token Management #####
+
+# GPT
+getPlexToken() {
+	if [ -n "$TOKEN" ]; then
+		[ "$VERBOSE" = "yes" ] && info "Fetching token from config"
+	elif getPlexServerToken; then
+		[ "$VERBOSE" = "yes" ] && info "Fetching token from Plex server"
+	elif [ -z "$TOKEN" -a -n "$EMAIL" -a -n "$PASS" ]; then
+		warn "Storing your email and password has been deprecated. Please re-run extras/installer.sh or see https://github.com/mrworf/plexupdate#faq"
+		getPlexWebToken
+	# Check if we're connected to a terminal
+	elif [ -z "$TOKEN" -a -t 0 ]; then
+		info "To continue, you will need to provide your Plex account credentials."
+		info "Your email and password will only be used to retrieve a 'token' and will not be saved anywhere."
+		echo
+		while true; do
+			read -e -p "PlexPass Email Address: " -i "$EMAIL" EMAIL
+			if [ -z "${EMAIL}" ] || [[ "$EMAIL" == *"@"* ]] && [[ "$EMAIL" != *"@"*"."* ]]; then
+				info "Please provide a valid email address"
+			else
+				break
+			fi
+		done
+		while true; do
+			read -e -p "PlexPass Password: " -i "$PASS" PASS
+			if [ -z "$PASS" ]; then
+				info "Please provide a password"
+			else
+				break
+			fi
+		done
+		getPlexWebToken
+	fi
+
+	[ -n "$TOKEN" ] # simulate exit status
+}
+
+# GPS
+getPlexServerToken() {
+	if [ -f /etc/default/plexmediaserver ]; then
+		source /etc/default/plexmediaserver
+	fi
+
+	# List possible locations to find Plex Server preference file
+	local VALIDPATHS=("${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" "/var/lib/plexmediaserver/Library/Application Support/" "${HOME}/Library/Application Support/")
+	local PREFFILE="/Plex Media Server/Preferences.xml"
+
+	for I in "${VALIDPATHS[@]}" ; do
+		if [ ! -z "${I}" -a -f "${I}${PREFFILE}" ]; then
+			# When running installer.sh directly from wget, $0 will return bash
+			if [ "$(basename $0)" = "installer.sh" -o "$(basename $0)" = "bash" ]; then
+				TOKEN=$(sudo sed -n 's/.*PlexOnlineToken="\([[:alnum:]]*\).*".*/\1/p' "${I}${PREFFILE}" 2>/dev/null)
+			else
+				TOKEN=$(sed -n 's/.*PlexOnlineToken="\([[:alnum:]]*\).*".*/\1/p' "${I}${PREFFILE}" 2>/dev/null)
+			fi
+		fi
+	done
+
+	[ -n "$TOKEN" ] # simulate exit status
+}
+
+# GPW
+getPlexWebToken() {
+	local FILE_POSTDATA=$(mktemp /tmp/plexupdate.postdata.XXXX)
+	local FILE_RAW=$(mktemp /tmp/plexupdate.raw.XXXX)
+	local FILE_FAILCAUSE=$(mktemp /tmp/plexupdate.failcause.XXXX)
+
+	# Fields we need to submit for login to work
+	#
+	# Field			Value
+	# utf8			&#x2713;
+	# authenticity_token	<Need to be obtained from web page>
+	# user[login]		$EMAIL
+	# user[password]	$PASS
+	# user[remember_me]	0
+	# commit		Sign in
+
+	# Build post data
+	echo -ne >"${FILE_POSTDATA}" "$(keypair "user[login]" "${EMAIL}" )"
+	echo -ne >>"${FILE_POSTDATA}" "&$(keypair "user[password]" "${PASS}" )"
+	echo -ne >>"${FILE_POSTDATA}" "&$(keypair "user[remember_me]" "0" )"
+
+	# Authenticate (using Plex Single Sign On)
+	wget --header "X-Plex-Client-Identifier: 4a745ae7-1839-e44e-1e42-aebfa578c865" --header "X-Plex-Product: Plex SSO" "${URL_LOGIN}" --post-file="${FILE_POSTDATA}" -q -S -O "${FILE_FAILCAUSE}" 2>"${FILE_RAW}"
+
+	# Provide some details to the end user
+	local RESULTCODE=$(head -n1 "${FILE_RAW}" | grep -oe '[1-5][0-9][0-9]')
+	if [ $RESULTCODE -eq 401 ]; then
+		error "Username and/or password incorrect"
+	elif [ $RESULTCODE -ne 201 ]; then
+		error "Failed to log in, debug information:"
+		cat "${FILE_RAW}" >&2
+	else
+		TOKEN=$(<"${FILE_FAILCAUSE}"  grep -ioe '"authToken":"[^"]*' | cut -c 14-)
+	fi
+
+	# Clean up temp files since they may contain sensitive information
+	rm "${FILE_FAILCAUSE}" "${FILE_POSTDATA}" "${FILE_RAW}"
+
+	[ -n "$TOKEN" ] # simulate exit status
+}
+
+# HELPERS
+keypair() {
+	local key="$( rawurlencode "$1" )"
+	local val="$( rawurlencode "$2" )"
+
+	echo "${key}=${val}"
+}
+
+rawurlencode() {
+	local string="${1}"
+	local strlen=${#string}
+	local encoded=""
+
+	for (( pos=0 ; pos<strlen ; pos++ )); do
+		c=${string:$pos:1}
+		case "$c" in
+		[-_.~a-zA-Z0-9] ) o="${c}" ;;
+		* )               printf -v o '%%%02x' "'$c"
+		esac
+		encoded+="${o}"
+	done
+	echo "${encoded}"
+}
+
+trimQuotes() {
+	local __buffer=$1
+
+	# Remove leading single quote
+	__buffer=${__buffer#\'}
+	# Remove ending single quote
+	__buffer=${__buffer%\'}
+
+	echo $__buffer
+}
+
+getRemoteSHA() {
+	# these two lines can't be combined. `local RESULT=` will gobble up the return
+	local RESULT
+	RESULT=$(wget -q "$1" -O - 2>/dev/null) || return 1
+	sha1sum <<< "$RESULT" | cut -f1 -d" "
+}
+
+getLocalSHA() {
+	[ -f "$1" ] || return 1
+	sha1sum "$1" | cut -f1 -d" "
+}
+
+# RNNG
+running() {
+	# If a server is unclaimed, it probably doesn't have TLS enabled either
+	local DATA
+	# get Plex sessions
+	DATA="$(wget -q -O - http://$1:$2/status/sessions)"
+	local RET=$?
+	# and live TV/DVR sessions
+	DATA+="$(wget -q -O - http://$1:$2/livetv/sessions)"
+
+	if [ ${RET} -eq 6 ]; then
+		# Server may be claimed, in which case we should use TLS and pass a token
+		getPlexToken
+		DATA="$(wget --no-check-certificate -q -O - https://$1:$2/status/sessions?X-Plex-Token=$TOKEN)"
+		RET=$?
+		DATA+="$(wget --no-check-certificate -q -O - https://$1:$2/livetv/sessions?X-Plex-Token=$TOKEN)"
+	fi
+
+	if [ ${RET} -eq 0 ]; then
+		# Get a total count of active media (MediaContainer size), then deduct one for every paused stream.
+		# If all streams are paused, we consider the server to not be active.
+		local mediacount="$(awk -F'"' '/<MediaContainer size="[0-9]+">/ {count+=$2}; /<Player[^>]* state="paused"/ {count--}; END {print count}' <<< "${DATA}")"
+		[ "$VERBOSE" = "yes" ] && printf 'Activity check reports a count of %i, based on return data of:\n%s\n\n' "${mediacount}" "${DATA}" >&2
+		[ $mediacount -gt 0 ] && return 0
+	fi
+
+	# if we don't know for sure that Plex is busy, assume that it's not so the update can proceed
+	return 1
+}
+
+verifyToken() {
+	wget -qO /dev/null "https://plex.tv/api/resources?X-Plex-Token=${TOKEN}"
+}
+
+isNewerVersion() {
+	# Returns true ONLY if 1 > 2.
+	[ -z "$1" ] && return 1
+	[ -z "$2" ] && return
+	[ "$1" = "$2" ] && return 1
+	if hash dpkg 2>/dev/null; then
+		dpkg --compare-versions "$1" gt "$2"
+	elif sort -V --version &>/dev/null; then
+		[ "$(printf "$1\n$2" | sort -Vr | head -n1)" = "$1" ]
+	else
+		# sort has had -V since at least 2009, so nobody should ever see this
+		warn "Unable to compare version numbers, assuming '$1' is newer."
+	fi
+}
+
+parseVersion() {
+	if [ "${REDHAT}" = "yes" ]; then
+		cut -f2- -d- <<< "$1" | cut -f1-4 -d.
+	else
+		cut -f2 -d_ <<< "$1"
+	fi
+}
+
+getPlexVersion() {
+	if [ "${REDHAT}" != "yes" ]; then
+		dpkg-query --showformat='${Version}' --show plexmediaserver 2>/dev/null
+	elif hash rpm 2>/dev/null; then
+		local rpmtemp
+		if rpmtemp=$(rpm -q plexmediaserver); then
+			parseVersion "$rpmtemp"
+		else
+			return 1
+		fi
+	else
+		error "Unknown OS, exiting."
+		exit 1
+	fi
+}
+
+verboseOutput() {
+	if [ "$VERBOSE" = "yes" ]; then
+		for i in $@; do
+			info "$i=${!i}"
+		done
+	fi
+}
+
+# Shared functions
+
+# SHARED
+warn() {
+	echo "WARNING: $@" >&1
+}
+
+info() {
+	echo "$@" >&1
+}
+
+error() {
+	echo "ERROR: $@" >&2
+}
+
+# Intentionally leaving this hard to find so that people aren't trying to use it manually.
+if [ "$(basename "$0")" = "get-plex-token" ]; then
+	[ -f /etc/plexupdate.conf ] && source /etc/plexupdate.conf
+	getPlexToken && info "Token = $TOKEN"
+fi
