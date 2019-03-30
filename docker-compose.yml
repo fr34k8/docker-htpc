@@ -82,19 +82,33 @@ services:
     ports:
       - "8000:80"
 
-  organizr:
-    container_name: organizr
-    image: joemiller/organizr
-    build: ./organizr
+  # organizr:
+  #   container_name: organizr
+  #   image: joemiller/organizr
+  #   build: ./organizr
+  #   restart: always
+  #   labels:
+  #     collectd_docker_app: organizr
+  #     collectd_docker_task: organizr
+  #   environment:
+  #     - PUID=65534
+  #     - PGID=65534
+  #   volumes:
+  #     - /virt/persistent/organizr:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #   ports:
+  #     - "8282:80"
+
+  organizr-v2:
+    container_name: organizr-v2
+    image: joemiller/organizr-v2
+    build: ./organizr-v2
     restart: always
-    labels:
-      collectd_docker_app: organizr
-      collectd_docker_task: organizr
     environment:
       - PUID=65534
       - PGID=65534
     volumes:
-      - /virt/persistent/organizr:/config
+      - /virt/persistent/organizr-v2:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8282:80"
