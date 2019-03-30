@@ -297,6 +297,27 @@ services:
     networks:
       - metrics
 
+  netdata:
+    container_name: netdata
+    image: joemiller/netdata
+    build: ./netdata
+    restart: always
+    hostname: server
+    environment:
+      # docker group from the host:
+      - PGID=128
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/lib/smartmontools:/var/log/smartd:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "19999:19999"
+
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
   #   container_name: collectd-docker
