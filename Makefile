@@ -12,15 +12,22 @@ rebuild: ## rebuild and recreate container specified in CONTAINER= arg
 	@docker-compose build --pull --no-cache $(CONTAINER)
 	@docker-compose up -d --force-recreate $(CONTAINER)
 
-rebuild-all:: _update-plex-version-file ## rebuild and recreate all containers
+rebuild-all:: _update-plex-version-file
+rebuild-all:: build-utility-images
+rebuild-all:: ## rebuild and recreate all containers
 	@docker-compose up -d --build --force-recreate
+
+build-utility-images:: build-snapraid
+build-utility-images:: build-mergerfs-tools
+
+build-snapraid: ## rebuild ./snapraid image
+	@docker build -t joemiller/snapraid ./snapraid
+
+build-mergerfs-tools: ## rebuild ./mergerfs-tools image
+	@docker build -t joemiller/mergerfs-tools ./mergerfs-tools
 
 _update-plex-version-file:
 	@./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
-
-# rebuild-plex: CONTAINER=plex ## special task for rebuild and recreate of the Plex container
-# rebuild-plex: _update-plex-version-file
-# rebuild-plex: rebuild
 
 # helpers
 help: ## print list of tasks and descriptions

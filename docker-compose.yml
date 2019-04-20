@@ -332,6 +332,27 @@ services:
     ports:
       - "19999:19999"
 
+  jenkins:
+    container_name: jenkins
+    image: joemiller/jenkins
+    build: ./jenkins
+    restart: always
+    hostname: server
+    environment:
+      - JAVA_OPTS="-Xmx256m"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      # jenkins runs with uid 1000:
+      #   sudo mkdir -p /virt/persistent/jenkins/ ; sudo chown -R 1000 /virt/persistent/jenkins/
+      - /virt/persistent/jenkins:/var/jenkins_home
+      # docker socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8090:8080"
+    # GID 128 is docker group from the host. Necessary to allow access to the docker.sock
+    user: jenkins:128
+
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
   #   container_name: collectd-docker
