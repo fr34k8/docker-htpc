@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 RUN apt-get -q update \
     && apt-get install -qy software-properties-common \
-    && add-apt-repository ppa:deluge-team/ppa \
+    && add-apt-repository ppa:deluge-team/stable \
     && apt-get update -q \
     && apt-get install -qy \
       deluged \
