@@ -206,10 +206,13 @@ services:
     build: ./timecapsule
     restart: always
     hostname: timecapsule
-    labels:
-      collectd_docker_app: timecapsule
-      collectd_docker_task: timecapsule
+    environment:
+      - TM_USER=backup
+      - TM_PW=backup
+      - TM_ID=34         # uid of the backup user on the host
+      - TM_SIZE=712000   # MB
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /files/timemachine:/timemachine
     networks:
       - localnet
@@ -352,6 +355,18 @@ services:
       - "8090:8080"
     # GID 128 is docker group from the host. Necessary to allow access to the docker.sock
     user: jenkins:128
+
+  nginx:
+    container_name: nginx
+    image: joemiller/nginx
+    build: ./nginx
+    restart: always
+    hostname: server
+    volumes:
+      - /files:/files:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "80:80"
 
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
