@@ -67,8 +67,10 @@ cleanup() {
 main() {
     echo "==> Started $(date)"
     init
+    du -shx "$REPO"
     backup
     cleanup
+    du -shx "$REPO"
     echo "==> Finished $(date)"
 }
 main "$@"
