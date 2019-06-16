@@ -23,16 +23,16 @@ build-utility-images:: build-mergerfs-tools
 build-utility-images:: build-backup-scripts
 
 build-snapraid: ## rebuild ./snapraid image
-	@docker build -t joemiller/snapraid ./snapraid
+	@docker build --no-cache --pull -t joemiller/snapraid ./snapraid
 
 build-rclone: ## rebuild ./rclone image
-	@docker build -t joemiller/rclone ./rclone
+	@docker build --no-cache --pull -t joemiller/rclone ./rclone
 
 build-mergerfs-tools: ## rebuild ./mergerfs-tools image
-	@docker build -t joemiller/mergerfs-tools ./mergerfs-tools
+	@docker build --no-cache --pull -t joemiller/mergerfs-tools ./mergerfs-tools
 
 build-backup-scripts: ## rebuild ./backup-scripts image
-	@docker build -t joemiller/backup-scripts ./backup-scripts
+	@docker build --no-cache --pull -t joemiller/backup-scripts ./backup-scripts
 
 _update-plex-version-file:
 	@./plex/plexupdate.sh -r | tail -1 | tee ./plex/download_url
