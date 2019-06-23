@@ -28,7 +28,8 @@ BUCKET="${BUCKET:-}"
 BWLIMIT="${BWLIMIT:-1.5m}"   # upload bandwidth limit, bytes
 
 RCLONE_FLAGS=("--b2-hard-delete" "--config=$RCLONE_CONFIG")
-RCLONE_FLAGS+=("--modify-window=1s" "--stats=300s" "--retries=10" "--transfers=32" "--checkers=48" "--bwlimit=${BWLIMIT}")
+RCLONE_FLAGS+=("--modify-window=1s" "--retries=10" "--transfers=32" "--checkers=48" "--bwlimit=${BWLIMIT}")
+RCLONE_FLAGS+=("--stats-log-level=NOTICE" "--stats=30m")
 # uncomment for interactive runs:
 # RCLONE_FLAGS+=("--progress" "--stats=5s")
 # uncomment for dry-run
@@ -39,6 +40,7 @@ sync() {
     local dir
 
     for dir in "${SYNC_DIRS[@]}"; do
+        echo "==> sync: $dir"
         #
         # rclone sync --flags /src b2:bucket/src
         #
@@ -48,7 +50,7 @@ sync() {
     done
 
     if [[ $errors -gt 0 ]]; then
-        echo "sync: There were $errors errors.";
+        echo "==> sync: $dir: There were $errors errors.";
         exit 1
     fi
 }
@@ -58,6 +60,7 @@ cleanup() {
     local dir
 
     for dir in "${SYNC_DIRS[@]}"; do
+        echo "==> cleanup: $dir"
         #
         # rclone cleanup --flags b2:bucket/src
         #
@@ -67,7 +70,7 @@ cleanup() {
     done
 
     if [[ $errors -gt 0 ]]; then
-        echo "Cleanup: There were $errors errors.";
+        echo "==> cleanup: $dir: There were $errors errors.";
         exit 1
     fi
 }
