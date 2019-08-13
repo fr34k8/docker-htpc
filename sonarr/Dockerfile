@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -q update \
     && apt-get install -qy software-properties-common \
     && add-apt-repository -y  multiverse \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FDA5DFFC \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0xA236C58F409091A18ACA53CBEBFF6B99D9B78493 \
     && add-apt-repository -y  'deb http://apt.sonarr.tv/ master main' \
     && apt-get update -q \
     && apt-get install -qy \
