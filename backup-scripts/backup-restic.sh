@@ -54,8 +54,8 @@ cleanup() {
       restic forget --keep-last 4 --keep-daily 14 --keep-weekly 8 --keep-monthly 12
     fi
 
-    # prune every 10th days-ish
-    if [[ $(( $(date +%e) % 10)) == 0 ]]; then
+    # prune every 30th days-ish
+    if [[ $(( $(date +%e) % 30)) == 0 ]]; then
       restic prune
     fi
 }
