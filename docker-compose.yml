@@ -65,22 +65,22 @@ services:
     ports:
       - "8181:8181"
 
-  muximux:
-    container_name: muximux
-    image: joemiller/muximux
-    build: ./muximux
-    restart: always
-    labels:
-      collectd_docker_app: muximux
-      collectd_docker_task: muximux
-    environment:
-      - PUID=65534
-      - PGID=65534
-    volumes:
-      - /virt/persistent/muximux:/config
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - "8000:80"
+  # muximux:
+  #   container_name: muximux
+  #   image: joemiller/muximux
+  #   build: ./muximux
+  #   restart: always
+  #   labels:
+  #     collectd_docker_app: muximux
+  #     collectd_docker_task: muximux
+  #   environment:
+  #     - PUID=65534
+  #     - PGID=65534
+  #   volumes:
+  #     - /virt/persistent/muximux:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #   ports:
+  #     - "8000:80"
 
   # organizr:
   #   container_name: organizr
@@ -367,6 +367,21 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "80:80"
+
+  nzbhydra2:
+    container_name: nzbhydra2
+    image: joemiller/nzbhydra2
+    build: ./nzbhydra2
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/nzbhydra2:/config
+      #- <nzb download>:/downloads
+    ports:
+      - 5076:5076
 
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
