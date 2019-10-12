@@ -1,6 +1,4 @@
-# https://hub.docker.com/r/linuxserver/unifi/
-#FROM linuxserver/unifi:latest
-FROM linuxserver/unifi:unstable
+FROM linuxserver/unifi-controller
 
 # remove x-frame-options header so that we can use this with muximux and organizr
 RUN sed -i -e '/X-Frame-Options/d' \
