@@ -123,6 +123,7 @@ services:
       collectd_docker_task: sabnzbd
     volumes:
       - /files:/files
+      - /tmp/sabnzbd:/tmp/sabnzbd
       - /virt/persistent/sabnzbd:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
@@ -382,6 +383,19 @@ services:
       #- <nzb download>:/downloads
     ports:
       - 5076:5076
+
+  # IPTV bridge for plex
+  # xteve:
+  #   container_name: xteve
+  #   image: joemiller/xteve
+  #   build: ./xteve
+  #   ports:
+  #     - "34400:34400"
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /virt/persistent/xteve/root:/root/xteve
+  #     - /virt/persistent/xteve/tmp:/tmp/xteve
 
   # TODO: broken as of Nov-2017. probably not compatible with newest docker
   # collectd-docker:
