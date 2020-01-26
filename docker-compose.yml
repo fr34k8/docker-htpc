@@ -165,8 +165,7 @@ services:
 
   plex:
     container_name: plex
-    image: joemiller/plex
-    build: ./plex
+    image: linuxserver/plex:latest
     restart: always
     labels:
       collectd_docker_app: plex
@@ -174,10 +173,14 @@ services:
     volumes:
       - /files:/files
       - /virt/persistent/plex:/config
+      - /tmp/plex-transcode:/transcode
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
     devices:
       - /dev/dri:/dev/dri
+    environment:
+      # linuxserver/plex: udpate to latest available including betas:
+      - VERSION=latest
     # ports:
     #   - "32400:32400"
 
@@ -410,3 +413,12 @@ services:
   #   networks:
   #     - metrics
 
+  # varken:
+  #   hostname: varken
+  #   container_name: varken
+  #   image: boerderij/varken
+  #   networks:
+  #     - metrics
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /virt/persistent/varken:/config
