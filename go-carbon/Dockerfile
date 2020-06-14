@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV GO_CARBON_PKG_URL https://github.com/lomik/go-carbon/releases/download/v0.9.1/go-carbon_0.9.1_amd64.deb
 
