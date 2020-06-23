@@ -13,7 +13,6 @@ RUN apt-get -q update \
     && apt-get install -qy \
       sabnzbdplus \
       par2-tbb \
-      python-sabyenc \
       unzip \
       unrar \
       locales \
