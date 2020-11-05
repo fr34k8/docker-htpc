@@ -1,0 +1,2 @@
+FROM analogj/scrutiny:latest
+

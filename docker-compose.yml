@@ -372,20 +372,43 @@ services:
     ports:
       - "80:80"
 
-  nzbhydra2:
-    container_name: nzbhydra2
-    image: joemiller/nzbhydra2
-    build: ./nzbhydra2
-    environment:
-      - PUID=65534
-      - PGID=65534
+  scrutiny:
+    container_name: scrutiny
+    image: joemiller/scrutiny
+    build: ./scrutiny
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - /virt/persistent/nzbhydra2:/config
-      #- <nzb download>:/downloads
+      - /run/udev:/run/udev:ro
+      - /virt/persistent/scrutiny:/scrutiny/config
+    devices:
+      - /dev/sda
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+      - /dev/sde
+      - /dev/sdf
+      - /dev/nvme0
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
     ports:
-      - 5076:5076
+      - 9988:8080
+
+  #nzbhydra2:
+  #  container_name: nzbhydra2
+  #  image: joemiller/nzbhydra2
+  #  build: ./nzbhydra2
+  #  environment:
+  #    - PUID=65534
+  #    - PGID=65534
+  #  volumes:
+  #    - /etc/localtime:/etc/localtime:ro
+  #    - /etc/timezone:/etc/timezone:ro
+  #    - /virt/persistent/nzbhydra2:/config
+  #    #- <nzb download>:/downloads
+  #  ports:
+  #    - 5076:5076
 
   # IPTV bridge for plex
   # xteve:
