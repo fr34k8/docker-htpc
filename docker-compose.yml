@@ -165,7 +165,8 @@ services:
 
   plex:
     container_name: plex
-    image: linuxserver/plex:latest
+    image: joemiller/plex
+    build: ./plex
     restart: always
     labels:
       collectd_docker_app: plex
@@ -177,7 +178,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
     devices:
-      - /dev/dri:/dev/dri
+       - /dev/dri:/dev/dri
     environment:
       # linuxserver/plex: udpate to latest available including betas:
       - VERSION=latest
@@ -394,6 +395,23 @@ services:
       - SYS_ADMIN
     ports:
       - 9988:8080
+
+  radarr:
+    container_name: radarr
+    image: joemiller/radarr
+    build: ./radarr
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/radarr:/config
+      - /files/movies:/movies
+      - /files/usenset/downloads:/downloads
+    ports:
+      - 7878:7878
 
   #nzbhydra2:
   #  container_name: nzbhydra2
