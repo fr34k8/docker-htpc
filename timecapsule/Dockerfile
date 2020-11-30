@@ -7,3 +7,5 @@ RUN delgroup kvm
 
 # don't advertise ssh and sftp
 RUN rm -f -- /etc/avahi/services/ssh.service /etc/avahi/services/sftp-ssh.service
+
+COPY smb.conf /etc/samba/smb.conf
