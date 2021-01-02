@@ -31,6 +31,7 @@ RCLONE_FLAGS=("--b2-hard-delete" "--config=$RCLONE_CONFIG")
 RCLONE_FLAGS+=("--modify-window=1s" "--retries=10" "--transfers=32" "--checkers=48" "--bwlimit=${BWLIMIT}")
 RCLONE_FLAGS+=("--stats-log-level=NOTICE" "--stats=30m")
 RCLONE_FLAGS+=("--links")
+RCLONE_FLAGS+=("--exclude=.gphotos.token")
 # uncomment for interactive runs:
 # RCLONE_FLAGS+=("--progress" "--stats=5s")
 # uncomment for dry-run
