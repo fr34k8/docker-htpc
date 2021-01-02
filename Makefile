@@ -14,15 +14,11 @@ rebuild-all:: ## rebuild and recreate all containers
 	@docker-compose up -d --build --force-recreate
 
 build-utility-images:: build-snapraid
-build-utility-images:: build-rclone
 build-utility-images:: build-mergerfs-tools
 build-utility-images:: build-backup-scripts
 
 build-snapraid: ## rebuild ./snapraid image
 	@docker build --no-cache --pull -t joemiller/snapraid ./snapraid
-
-build-rclone: ## rebuild ./rclone image
-	@docker build --no-cache --pull -t joemiller/rclone ./rclone
 
 build-mergerfs-tools: ## rebuild ./mergerfs-tools image
 	@docker build --no-cache --pull -t joemiller/mergerfs-tools ./mergerfs-tools
