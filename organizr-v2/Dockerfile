@@ -1,1 +1,1 @@
-FROM organizrtools/organizr-v2
+FROM organizr/organizr
