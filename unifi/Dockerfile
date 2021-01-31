@@ -1,4 +1,4 @@
-FROM linuxserver/unifi-controller
+FROM ghcr.io/linuxserver/unifi-controller:latest
 
 # remove x-frame-options header so that we can use this with muximux and organizr
 RUN sed -i -e '/X-Frame-Options/d' \
