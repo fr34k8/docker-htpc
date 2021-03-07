@@ -34,6 +34,7 @@ set -eou pipefail
 
 REPO="${REPO:-/data}"
 REPO_PASSWD_FILE="${REPO_PASSWD_FILE:-/config/zbackup.pass}"
+MAX_DAYS="${MAX_DAYS:-180}"
 
 BACKUP_HOST="${BACKUP_HOST:-}"
 BACKUP_USER="${BACKUP_USER:-}"
@@ -59,7 +60,7 @@ backup() {
 
 cleanup() {
     echo "==> Removing old backups"
-    find "$REPO/backups/" -type f -mtime +180 -print -delete
+    find "$REPO/backups/" -type f -mtime +"$MAX_DAYS" -print -delete
 
     zbackup gc --password-file "$REPO_PASSWD_FILE" "$REPO"
 }
