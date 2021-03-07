@@ -14,12 +14,15 @@ RUN apt-get -q update \
       sabnzbdplus \
       par2-tbb \
       unzip \
+      p7zip-full \
       unrar \
       locales \
     && apt-get -y autoremove \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
+
+RUN ln -s /usr/bin/unrar-nonfree /usr/bin/unrar
 
 # Set the locale so that SABnzbd can properly handle unicoded files
 RUN locale-gen en_US.UTF-8
