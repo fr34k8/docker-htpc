@@ -1,5 +1,9 @@
 FROM grafana/grafana:latest
 
+# NOTE: this doesn't work because the /var/lib/grafana/plugins is mounted in from the host.
+# to insall plugins, docker-exec into the running container, run the plugin install command, then retart the container
+#RUN grafana-cli plugins install grafana-worldmap-panel
+
 USER nobody
 
 # disable x-frame-options: deny, so that we can be used with organizr
