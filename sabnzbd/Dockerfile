@@ -22,8 +22,6 @@ RUN apt-get -q update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-RUN ln -s /usr/bin/unrar-nonfree /usr/bin/unrar
-
 # Set the locale so that SABnzbd can properly handle unicoded files
 RUN locale-gen en_US.UTF-8
 # install s6-overlay init manager (https://github.com/just-containers/s6-overlay)
