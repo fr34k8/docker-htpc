@@ -303,6 +303,8 @@ services:
       collectd_docker_task: influxdb
     volumes:
       - /virt/persistent/influxdb:/var/lib/influxdb
+      - /virt/persistent/influxdb2:/var/lib/influxdb2
+      - /virt/persistent/influxdb2/etc-influxdb2:/etc/influxdb2
     networks:
       - metrics
     ports:
@@ -321,26 +323,26 @@ services:
     networks:
       - metrics
 
-  netdata:
-    container_name: netdata
-    image: joemiller/netdata
-    build: ./netdata
-    restart: always
-    hostname: server
-    environment:
-      # docker group from the host:
-      - PGID=128
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor=unconfined
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/lib/smartmontools:/var/log/smartd:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "19999:19999"
+  # netdata:
+  #   container_name: netdata
+  #   image: joemiller/netdata
+  #   build: ./netdata
+  #   restart: always
+  #   hostname: server
+  #   environment:
+  #     # docker group from the host:
+  #     - PGID=128
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   security_opt:
+  #     - apparmor=unconfined
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /var/lib/smartmontools:/var/log/smartd:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   ports:
+  #     - "19999:19999"
 
   jenkins:
     container_name: jenkins
@@ -379,6 +381,7 @@ services:
     container_name: scrutiny
     image: joemiller/scrutiny
     build: ./scrutiny
+    restart: always
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -398,22 +401,34 @@ services:
     ports:
       - 9988:8080
 
-  # radarr:
-  #   container_name: radarr
-  #   image: joemiller/radarr
-  #   build: ./radarr
-  #   environment:
-  #     - PUID=65534
-  #     - PGID=65534
-  #     - TZ=America/Los_Angeles
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /etc/timezone:/etc/timezone:ro
-  #     - /virt/persistent/radarr:/config
-  #     - /files/movies:/movies
-  #     - /files/usenset/downloads:/downloads
-  #   ports:
-  #     - 7878:7878
+  radarr:
+    container_name: radarr
+    image: joemiller/radarr
+    build: ./radarr
+    restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/radarr:/config
+      - /files/movies:/movies
+      - /files/usenet/downloads:/files/usenet/downloads
+    ports:
+      - 7878:7878
+
+  homeassistant:
+    container_name: homeassistant
+    image: joemiller/homeassistant
+    build: ./homeassistant
+    restart: always
+    volumes:
+      - /virt/persistent/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    network_mode: host
 
   #nzbhydra2:
   #  container_name: nzbhydra2
