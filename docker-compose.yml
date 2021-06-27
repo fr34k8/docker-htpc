@@ -139,6 +139,8 @@ services:
       collectd_docker_task: sonarr
     environment:
       - XDG_CONFIG_HOME=/config
+      - PUID=65534
+      - PGID=65534
     volumes:
       - /files:/files
       - /virt/persistent/sonarr:/config
