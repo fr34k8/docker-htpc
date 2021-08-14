@@ -430,20 +430,21 @@ services:
     restart: always
     network_mode: host
 
-  #nzbhydra2:
-  #  container_name: nzbhydra2
-  #  image: joemiller/nzbhydra2
-  #  build: ./nzbhydra2
-  #  environment:
-  #    - PUID=65534
-  #    - PGID=65534
-  #  volumes:
-  #    - /etc/localtime:/etc/localtime:ro
-  #    - /etc/timezone:/etc/timezone:ro
-  #    - /virt/persistent/nzbhydra2:/config
-  #    #- <nzb download>:/downloads
-  #  ports:
-  #    - 5076:5076
+  nzbhydra2:
+    container_name: nzbhydra2
+    image: joemiller/nzbhydra2
+    build: ./nzbhydra2
+    restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/nzbhydra2:/config
+      #- <nzb download>:/downloads
+    ports:
+      - 5076:5076
 
   # IPTV bridge for plex
   # xteve:
