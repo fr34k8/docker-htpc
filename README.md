@@ -1,6 +1,9 @@
 docker-htpc
 ===========
 
+> :warning: This readme is NOT up to date. Just use the pieces as an example for your
+> own configs.
+
 Containers for HTPC apps.
 
 All containers are built from the `ubuntu:trusty` base image because most of the
