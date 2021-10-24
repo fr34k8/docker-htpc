@@ -165,6 +165,24 @@ services:
       - "8083:8083"
     #   - "53160:53160"
 
+  # qbittorrent:
+  #   container_name: qbittorrent
+  #   image: joemiller/qbittorrent
+  #   build: ./qbittorrent
+  #   environment:
+  #     - PUID=65534
+  #     - PGID=65534
+  #     - TZ=America/Los_Angeles
+  #     - WEBUI_PORT=8084
+  #   volumes:
+  #     - /path/to/appdata/config:/config
+  #     - /path/to/downloads:/downloads
+  #   ports:
+  #     - 6881:6881
+  #     - 6881:6881/udp
+  #     - 8084:8084
+  #   restart: unless-stopped
+
   plex:
     container_name: plex
     image: joemiller/plex
@@ -259,28 +277,45 @@ services:
     ports:
       - "3000:3000"
 
-  graphite-api:
-    container_name: graphite-api
-    image: joemiller/graphite-api
-    build: ./graphite-api
+  # 2021-10-24: disabled graphite-api. Appears the project is abandoned. Using graphite-web from official graphite image instead
+  # graphite-api:
+  #   container_name: graphite-api
+  #   image: joemiller/graphite-api
+  #   build: ./graphite-api
+  #   restart: always
+  #   volumes:
+  #     - /virt/persistent/graphite-api/graphite-api.yaml:/etc/graphite-api.yaml
+  #     - /virt/persistent/go-carbon/data:/data
+  #   networks:
+  #     - metrics
+
+  # official graphite container with only graphite-web and nginx running
+  graphite:
+    container_name: graphite
+    image: joemiller/graphite
+    build: ./graphite
     restart: always
-    labels:
-      collectd_docker_app: graphite-api
-      collectd_docker_task: graphite-api
+    environment:
+      - CARBON_DISABLED=1
+      - CARBON_AGGREGATOR_DISABLED=1
+      - STATSD_DISABLED=1
+      - GO_CARBON_DISABLED=1
+      - REDIS_DISABLED=1
+      - GRAPHITE_CARBONLINK_HOSTS=go-carbon:7002
     volumes:
-      - /virt/persistent/graphite-api/graphite-api.yaml:/etc/graphite-api.yaml
-      - /virt/persistent/go-carbon/data:/data
+      - /virt/persistent/graphite:/opt/graphite/conf
+      - /virt/persistent/go-carbon/data:/opt/graphite/storage/whisper
     networks:
       - metrics
+    # uncomment to expose the graphite-web UI
+    # ports:
+    #   - "9111:80"
 
   go-carbon:
     container_name: go-carbon
     image: joemiller/go-carbon
     restart: always
     build: ./go-carbon
-    labels:
-      collectd_docker_app: graphite-api
-      collectd_docker_task: graphite-api
     volumes:
       - /virt/persistent/go-carbon/data:/data
       - /virt/persistent/go-carbon/config:/config
