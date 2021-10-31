@@ -99,11 +99,12 @@ services:
       - PGID=65534
       - TZ=America/Los_Angeles
     volumes:
+      - /files:/files
+      - /virt/persistent/radarr:/config
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - /virt/persistent/radarr:/config
-      - /files/movies:/movies
-      - /files/usenet/downloads:/files/usenet/downloads
+      # - /files/movies:/movies
+      # - /files/usenet/downloads:/files/usenet/downloads
     ports:
       - 7878:7878
 
