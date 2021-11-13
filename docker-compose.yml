@@ -103,8 +103,6 @@ services:
       - /virt/persistent/radarr:/config
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      # - /files/movies:/movies
-      # - /files/usenet/downloads:/files/usenet/downloads
     ports:
       - 7878:7878
 
@@ -375,16 +373,16 @@ services:
     ports:
       - 9988:8080
 
-  homeassistant:
-    container_name: homeassistant
-    image: joemiller/homeassistant
-    build: ./homeassistant
-    restart: always
-    volumes:
-      - /virt/persistent/homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-    restart: always
-    network_mode: host
+  # homeassistant:
+  #   container_name: homeassistant
+  #   image: joemiller/homeassistant
+  #   build: ./homeassistant
+  #   restart: always
+  #   volumes:
+  #     - /virt/persistent/homeassistant:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #   restart: always
+  #   network_mode: host
 
   nzbhydra2:
     container_name: nzbhydra2
@@ -401,6 +399,23 @@ services:
       #- <nzb download>:/downloads
     ports:
       - 5076:5076
+
+  bazarr:
+    container_name: bazarr
+    image: joemiller/bazarr
+    build: ./bazarr
+    restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/bazarr:/config
+      - /files:/files
+    ports:
+      - 6767:6767
 
   # IPTV bridge for plex
   # xteve:
