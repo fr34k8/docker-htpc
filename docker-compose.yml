@@ -450,6 +450,24 @@ services:
     networks:
       - metrics
 
+  syslog-ng-converter:
+    container_name: syslog-ng-converter
+    image: joemiller/syslog-ng-converter
+    build: ./syslog-ng-converter
+    restart: always
+    # uncomment for more debug output:
+    #command: -dve
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - metrics
+    ports:
+      - "1514:1514"
+      - "1514:1514/udp"
+
   # IPTV bridge for plex
   # xteve:
   #   container_name: xteve
