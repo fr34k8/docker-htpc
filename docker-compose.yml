@@ -417,6 +417,39 @@ services:
     ports:
       - 6767:6767
 
+  loki:
+    container_name: loki
+    image: joemiller/loki
+    build: ./loki
+    restart: always
+    command: -config.file=/etc/loki/local-config.yaml
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /virt/persistent/loki/data:/data
+    networks:
+      - metrics
+    ports:
+      - 3100:3100
+
+  promtail:
+    container_name: promtail
+    image: joemiller/promtail
+    build: ./promtail
+    restart: always
+    command: -config.file=/etc/promtail/promtail.yaml
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /var/log:/var/log:ro
+      - /virt/persistent/loki/promtail:/data
+    networks:
+      - metrics
+
   # IPTV bridge for plex
   # xteve:
   #   container_name: xteve
