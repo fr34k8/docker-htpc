@@ -108,17 +108,20 @@ services:
 
   deluge:
     container_name: deluge
-    image: joemiller/deluge
-    build: ./deluge
+    image: linuxserver/deluge:2.0.5
     restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=America/Los_Angeles
     volumes:
       - /files:/files
       - /virt/persistent/deluge:/config
       - /etc/localtime:/etc/localtime:ro
-    #network_mode: host
     ports:
-      - "8083:8083"
-    #   - "53160:53160"
+      - "8083:8112" # previous config used 8083 for web, linuxserver uses 8112. re-map for backwards compat
+      - "6881:6881"
+      - "6881:6881/udp"
 
   # qbittorrent:
   #   container_name: qbittorrent
