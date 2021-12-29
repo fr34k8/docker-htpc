@@ -1,1 +1,0 @@
-FROM emby/embyserver

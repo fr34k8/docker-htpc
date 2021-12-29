@@ -33,8 +33,7 @@ networks:
 services:
   tautulli:
     container_name: tautulli
-    image: joemiller/tautulli
-    build: ./tautulli
+    image: tautulli/tautulli:latest
     restart: always
     environment:
       - PUID=65534
@@ -48,9 +47,7 @@ services:
 
   organizr-v2:
     container_name: organizr-v2
-    #image: joemiller/organizr-v2
     image: organizr/organizr:latest
-    # build: ./organizr-v2
     restart: always
     environment:
       - PUID=65534
@@ -63,9 +60,12 @@ services:
 
   sabnzbd:
     container_name: sabnzbd
-    image: joemiller/sabnzbd
-    build: ./sabnzbd
+    image: lscr.io/linuxserver/sabnzbd:latest
     restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=America/Los_Angeles
     volumes:
       - /files:/files
       - /tmp/sabnzbd:/tmp/sabnzbd
@@ -124,7 +124,7 @@ services:
 
   # qbittorrent:
   #   container_name: qbittorrent
-  #   image: joemiller/qbittorrent
+  #   image: qbittorrent
   #   build: ./qbittorrent
   #   environment:
   #     - PUID=65534
@@ -160,8 +160,7 @@ services:
 
   emby:
     container_name: emby
-    image: joemiller/embyserver
-    build: ./emby
+    image: emby/embyserver:latest
     restart: always
     volumes:
       - /files:/files
@@ -177,7 +176,6 @@ services:
 
   timecapsule:
     container_name: timecapsule
-    image: joemiller/timecapsule
     build: ./timecapsule
     restart: always
     hostname: timecapsule
@@ -194,7 +192,6 @@ services:
 
   unifi:
     container_name: unifi
-    image: joemiller/unifi
     build: ./unifi
     restart: always
     environment:
@@ -209,7 +206,6 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana
     build: ./grafana
     restart: always
     environment:
@@ -236,8 +232,7 @@ services:
   # official graphite container with only graphite-web and nginx running
   graphite:
     container_name: graphite
-    image: joemiller/graphite
-    build: ./graphite
+    image: graphiteapp/graphite-statsd
     restart: always
     environment:
       - CARBON_DISABLED=1
@@ -257,7 +252,6 @@ services:
 
   go-carbon:
     container_name: go-carbon
-    image: joemiller/go-carbon
     restart: always
     build: ./go-carbon
     volumes:
@@ -274,8 +268,7 @@ services:
 
   influxdb:
     container_name: influxdb
-    image: joemiller/influxdb
-    build: ./influxdb
+    image: influxdb:1.8
     restart: always
     volumes:
       - /virt/persistent/influxdb:/var/lib/influxdb
@@ -288,7 +281,6 @@ services:
 
   telegraf-snmp-unifi:
     container_name: telegraf-snmp-unifi
-    image: joemiller/telegraf-snmp-unifi
     build: ./telegraf-snmp-unifi
     restart: always
     volumes:
@@ -319,7 +311,6 @@ services:
 
   jenkins:
     container_name: jenkins
-    image: joemiller/jenkins
     build: ./jenkins
     restart: always
     hostname: server
@@ -340,7 +331,6 @@ services:
 
   nginx:
     container_name: nginx
-    image: joemiller/nginx
     build: ./nginx
     restart: always
     hostname: server
@@ -352,8 +342,7 @@ services:
 
   scrutiny:
     container_name: scrutiny
-    image: joemiller/scrutiny
-    build: ./scrutiny
+    image: analogj/scrutiny:latest
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -418,7 +407,6 @@ services:
 
   loki:
     container_name: loki
-    image: joemiller/loki
     build: ./loki
     restart: always
     command: -config.file=/etc/loki/local-config.yaml
@@ -435,7 +423,6 @@ services:
 
   promtail:
     container_name: promtail
-    image: joemiller/promtail
     build: ./promtail
     restart: always
     command: -config.file=/etc/promtail/promtail.yaml
@@ -451,7 +438,6 @@ services:
 
   syslog-ng-converter:
     container_name: syslog-ng-converter
-    image: joemiller/syslog-ng-converter
     build: ./syslog-ng-converter
     restart: always
     # uncomment for more debug output:
@@ -537,10 +523,24 @@ services:
       - /virt/persistent/teslamate/mosquitto-data:/mosquitto/data
   # -- END teslamate stack --
 
-  # build only containers. These are not services.
+  # build-only containers / utility containers. These are not services.
   snapraid:
     container_name: snapraid
-    image: snapraid
+    image: joemiller/snapraid
     build: ./snapraid
+    entrypoint: "bash -c"
+    command: "exit 0"
+
+  mergerfs-tools:
+    container_name: mergerfs-tools
+    image: joemiller/mergerfs-tools
+    build: ./mergerfs-tools
+    entrypoint: "bash -c"
+    command: "exit 0"
+
+  backup-scripts:
+    container_name: backup-scripts
+    image: joemiller/backup-scripts
+    build: ./backup-scripts
     entrypoint: "bash -c"
     command: "exit 0"
