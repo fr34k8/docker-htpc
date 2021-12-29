@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+sed -i -e '/X-Frame-Options/d' \
+  /usr/lib/unifi/webapps/ROOT/WEB-INF/resourcerewrite.xml \
+  /usr/lib/unifi/webapps/ROOT/WEB-INF/urlrewrite.xml
