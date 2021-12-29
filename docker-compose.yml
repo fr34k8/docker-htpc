@@ -48,8 +48,9 @@ services:
 
   organizr-v2:
     container_name: organizr-v2
-    image: joemiller/organizr-v2
-    build: ./organizr-v2
+    #image: joemiller/organizr-v2
+    image: organizr/organizr:latest
+    # build: ./organizr-v2
     restart: always
     environment:
       - PUID=65534
@@ -143,8 +144,7 @@ services:
 
   plex:
     container_name: plex
-    image: joemiller/plex
-    build: ./plex
+    image: ghcr.io/linuxserver/plex:latest
     restart: always
     volumes:
       - /files:/files
@@ -211,7 +211,7 @@ services:
 
   grafana:
     container_name: grafana
-    image: joemiller/grafana
+    image: grafana
     build: ./grafana
     restart: always
     environment:
@@ -405,8 +405,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: joemiller/bazarr
-    build: ./bazarr
+    image: lscr.io/linuxserver/bazarr:latest
     restart: always
     environment:
       - PUID=65534
@@ -540,3 +539,11 @@ services:
       - /virt/persistent/teslamate/mosquitto-conf:/mosquitto/config
       - /virt/persistent/teslamate/mosquitto-data:/mosquitto/data
   # -- END teslamate stack --
+
+  # build only containers. These are not services.
+  snapraid:
+    container_name: snapraid
+    image: snapraid
+    build: ./snapraid
+    entrypoint: "bash -c"
+    command: "exit 0"

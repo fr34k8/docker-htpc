@@ -1,1 +1,0 @@
-FROM organizr/organizr

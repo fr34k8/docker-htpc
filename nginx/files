@@ -1,0 +1,12 @@
+server {
+  listen 80;
+  listen [::]:80;
+  server_name  server;
+
+  location / {
+    root   /files;
+    autoindex on;
+    autoindex_localtime on;
+    index  index.html index.htm;
+  }
+}

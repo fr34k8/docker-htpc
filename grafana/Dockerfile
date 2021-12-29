@@ -1,4 +1,4 @@
-FROM grafana/grafana:latest
+FROM grafana/grafana:8.3.3
 
 # NOTE: this doesn't work because the /var/lib/grafana/plugins is mounted in from the host.
 # to insall plugins, docker-exec into the running container, run the plugin install command, then retart the container
