@@ -76,8 +76,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: joemiller/sonarr
-    build: ./sonarr
+    image: lscr.io/linuxserver/sonarr:latest
     restart: always
     environment:
       - XDG_CONFIG_HOME=/config
@@ -92,8 +91,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: joemiller/radarr
-    build: ./radarr
+    image: lscr.io/linuxserver/radarr:latest
     restart: always
     environment:
       - PUID=65534
@@ -144,7 +142,7 @@ services:
 
   plex:
     container_name: plex
-    image: ghcr.io/linuxserver/plex:latest
+    image: lscr.io/linuxserver/plex:latest
     restart: always
     volumes:
       - /files:/files
@@ -389,8 +387,7 @@ services:
 
   nzbhydra2:
     container_name: nzbhydra2
-    image: joemiller/nzbhydra2
-    build: ./nzbhydra2
+    image: lscr.io/linuxserver/nzbhydra2:latest
     restart: always
     environment:
       - PUID=65534
